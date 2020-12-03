@@ -33,6 +33,7 @@ export function Nest( panels,
 ) {
 
     function panelArrayCreator() {
+        // console.log(CSVToArray( panels ));
         return new List( CSVToArray( panels )
                 .slice( firstPanelRow )
                 .flatMap( i => {
@@ -48,16 +49,19 @@ export function Nest( panels,
             uniqueIDs.push( [ `${id} (${n}/${quantity})`, parseFloat(width), parseFloat(height) ] )
             n++
         }
-        console.log(uniqueIDs);
+        // console.log(uniqueIDs);
         return uniqueIDs
     }
 
+    ERRORS = []
     const PANELS = panelArrayCreator()          // raw csv panel input converted
     // const METRIC_UNITS = metricUnits  // default false
     // const TARGET_FIT = 0.8                      // ratio of a good fit per sheet
     CUTTER = cutter
     GAP = gap
-    MATERIAL = material
+    MATERIAL.width = material.width
+    MATERIAL.height = material.height
+    MATERIAL.margins = material.margins
 
 
 
@@ -80,7 +84,8 @@ export function Nest( panels,
             else column.push( row )
         }
         // smallest pieces to center of column
-        return column.shuffle()
+        // return column.shuffle()
+        return column.ascendingWidth()
     }
 
 
@@ -104,7 +109,8 @@ export function Nest( panels,
             sheet.push( columns.fitsSheet( sheet ).place() )
         }
         // smallest pieces to center of sheet
-        return sheet.shuffle()
+        // return sheet.shuffle()
+        return sheet
     }
 
     function makeSheets( panels ) {
@@ -166,10 +172,8 @@ export function Nest( panels,
             })
         })
     }
-    // console.log(MATERIAL.max_width());
-    // console.log( PANELS )
     let sheets = makeSheets( PANELS )
-    return [ PANELS, sheets]
+    return [ PANELS, sheets, ERRORS ]
 }
 
 
@@ -246,6 +250,7 @@ class List extends Array {
     //     this.removeIndex( array.indexOf( value ) )
     // }
     shuffle() {
+        if ( this.length < 3 ) return this
         return new List( ...this.slice(1), this.first() )
     }
     // sorting methods
@@ -265,7 +270,7 @@ class List extends Array {
         return this.map(panel => {
                 if ( panel.width > MATERIAL.max_width() ||
                      panel.height > MATERIAL.max_height() ) {
-                    ERRORS.push(`panel ${panel.id} is too big`)
+                    ERRORS.push(`Panel ${panel.id} is too big`)
                     return false
                 }
                 return panel
@@ -342,13 +347,15 @@ class List extends Array {
         return this.notPlaced()
             .filter(panel => panel.width <= group[0].width)
             .filter(panel => panel.height < group.remainingHeight( maxHeight ))
-            .biggest()
+            // .biggest()
+            .widest()
     }
     fitsRow( group, maxWidth ) {
         return this.notPlaced()
             .filter(panel => panel.height <= group[0].height)
             .filter(panel => panel.width < group.remainingWidth( maxWidth ))
-            .biggest()
+            // .biggest()
+            .widest()
     }
     fitsSheet( group, maxWidth = MATERIAL.width ) {
         return this.notPlaced()

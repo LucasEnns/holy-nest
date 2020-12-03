@@ -1,30 +1,30 @@
 <script>
    import { Nest } from "../nest.js"
-   import { panels, sheets } from "../stores.js"
+   import { panels, sheets, errors } from "../stores.js"
    $: fileName = ""
    let files
-   let material = {
+   $: material = {
       width: 49,
       height: 97,
       margins: 0.25
    }
-   // let materialH = 97
-   // let margins = 0.25
-   let cutter = 0.375
-   let gap = 0
-   let units = false
+   $: cutter = 0.375
+   $: gap = 0
+   $: units = false
+
+
 
    function showFile() {
       let file = files.files[0]
-      let textFile = /text.csv/
+      // let textFile = /text\/csv/
       let reader = new FileReader()
-      fileName = files.value.split( "\\" ).pop()
+      fileName = file.name.replace('.csv', '')
 
-      if (file.type.match(textFile)) {
+      if ( file.type === 'text/csv' ) {
          reader.onload = function (event) {
             let nest = Nest(
                event.target.result, // csv file
-               5,                   // panel starting row csv
+               4,                   // panel starting row csv
                units,
                cutter,
                gap,
@@ -33,9 +33,11 @@
 
             $panels = nest[0]
             $sheets = nest[1]
+            $errors = nest[2]
+            if ( $errors.length ) alert( $errors )
          }
       } else {
-         fileName = "CSV's please!!!";
+         fileName = "file.💩"
       }
       reader.readAsText(file);
    }
@@ -51,6 +53,12 @@
       text-align: center;
       /* vertical-align: middle; */
    }
+
+img {
+
+   vertical-align: -.5em;
+   height: 1.8em;
+}
 
 .inputfile{
 	width: 0.1px;
@@ -113,7 +121,7 @@ input[type="number"] {
 
 <div class="upload-wrapper">
    <input class="inputfile" name="file" id="file" type="file" on:change={showFile} bind:this={files} />
-   <label for="file">{fileName == "" ? "Import" : fileName}</label>
+   <label for="file">{fileName == "" ? "Open" : fileName} <img src="./favicon.png" alt="open csv file"></label>
 </div>
 <div class="input-wrapper">
    <h5>Material W x H</h5>

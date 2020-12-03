@@ -49,11 +49,37 @@ export function CSVToArray( strData, strDelimiter = "," ) {
             var strMatchedValue = arrMatches[ 3 ]
         }
 
+        if ( hasNumber( strMatchedValue ) ) {
+            strMatchedValue = toFloat( strMatchedValue )
+        }
+
         // Now that we have our value string, let's add
         // it to the data array.
         arrData[ arrData.length - 1 ].push( strMatchedValue )
     }
 
     // Return the parsed data.
-    return( arrData )
+    return arrData.filter( item =>
+                item.filter( inner => inner !== "" ).length )
+}
+function hasNumber( str ) {
+    return /\d/.test( str );
+}
+
+function toFloat( str ) {
+    if (!isNaN( str )) return parseFloat( str ) // if number return float
+    if (str.includes("/") && !str.includes(".")) {
+        return str
+            .split( " " )
+            .filter( item => item !== "" ) // for multiple spaces
+            .reduce( ( total, item ) => {
+                if ( item.includes( "/" ) ) {
+                    let frac = item
+                        .split( "/" )
+                        .filter( item => item !== "" )
+                    return total + parseFloat( frac[0] / frac[1] )}
+                return total + parseFloat( item )
+                }, 0 )
+    }
+    return str
 }

@@ -4,6 +4,11 @@ import { panels, sheets } from '../stores.js'
 $: viewBoxW = $sheets.length * $sheets[0].sheet_width || 49
 $: viewBoxH = $sheets.sheet_height || 97
 
+function showSize() {
+    alert(`width: ${this.width.baseVal.valueAsString}
+` +     `height: ${this.height.baseVal.valueAsString}`)
+}
+
 </script>
 
 <style>
@@ -45,6 +50,7 @@ $: viewBoxH = $sheets.sheet_height || 97
     {/each}
     {#each $panels as panel}
         <rect
+            on:click={showSize}
             class="panel"
             id="panel"
             x="{panel.x0}in"
