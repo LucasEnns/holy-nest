@@ -8,7 +8,7 @@
 
 
    import { Nest } from "../nest.js"
-   import { panels, sheets, fileInfo } from "../stores.js"
+   import { panels, sheets, fileInfo, svg } from "../stores.js"
    import { saveAs } from 'file-saver'
    $: badFile = false
    let files
@@ -137,6 +137,12 @@ input[type="number"] {
          <h1 on:mouseover={() => badFile = false}>💩</h1>
       {/if}
    </label>
+</div>
+<div>
+   <h4 on:click={showFile}>recalculate</h4>
+</div>
+<div class="save">
+   <a href="data:text/plain;charset=utf-8,{encodeURIComponent($svg)}" download="{$fileInfo.name}.svg">save</a>
 </div>
 <!-- <div class="save">
    <a href="data:text/plain;charset=utf-8,{encodeURIComponent(gCode)}" download="{$sheets[0].id}.cnc">save</a>

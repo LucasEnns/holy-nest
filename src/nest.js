@@ -12,6 +12,10 @@
 // new technique-- class panel widths by +- %
 // if none next is +- 1/2 of width
 
+// idea 2
+// start width columns of all the similar widths
+// that join columns
+
 
 // import { toDECIMAL } from "./methods"
 import { CSVToArray } from "./csv.js";

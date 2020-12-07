@@ -14,5 +14,6 @@ const fallback = [
 export const panels = localStore('panels', [])
 export const sheets = localStore('sheets', [])
 export const fileInfo = localStore('file-info', {})
+export const svg = localStore('svg', '')
 
 // export const inputTemplate = localStore('template', template)

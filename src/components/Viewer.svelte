@@ -1,18 +1,30 @@
 <script>
-import { panels, sheets } from '../stores.js'
+import { panels, sheets, svg } from '../stores.js'
+import { afterUpdate } from 'svelte'
 
-let id, width, height, checkSize = false, mx = 0, my = 0,
-top = 0
-, left = 0
+let id,
+    width,
+    height,
+    checkSize = false,
+    mx = 0,
+    my = 0,
+    top = 0,
+    left = 0,
+    scale = 90, // inches to pixels
+    svgFile
 $: viewBoxW = $sheets.length * $sheets[0].sheet_width || 61
-$: viewBoxH = $sheets.sheet_height || 121
+$: viewBoxH = $sheets[0].sheet_height || 121
+
+
+afterUpdate(() => {
+    $svg = svgFile.innerHTML.toString()
+})
+
+
 
 function showSizes() {
     checkSize = true
-    // console.log(card);
-    var rect = this.getBoundingClientRect();
-    // console.log(rect.top, rect.right, rect.bottom, rect.left);
-    // card.style.left = mouse
+    let rect = this.getBoundingClientRect();
     top = rect.bottom + 12
     left = rect.left + 12
     id = this.id
@@ -114,55 +126,67 @@ function hideSizes( event ) {
 
 </style>
 
-<div class="viewer">
-    {#if checkSize}
+{#if checkSize}
 <div class="infocard" style="left: {left}px; top: {top}px;">
-            <h4 class="sizes">Panel: {id}</h4>
-            <h4 class="sizes">Width: {width}</h4>
-            <h4 class="sizes">Height: {height}</h4>
-        </div>
-    {/if}
+    <h4 class="sizes">Panel: {id}</h4>
+    <h4 class="sizes">Width: {width}</h4>
+    <h4 class="sizes">Height: {height}</h4>
+</div>
+{/if}
 
-<svg class="print" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 {viewBoxW*96} {viewBoxH* 96}" preserveAspectRatio="xMidYMid meet">
+
+<div class="viewer"    bind:this={svgFile}>
+<svg class="print"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    width="{viewBoxW * scale}"
+    height="{viewBoxH * scale}"
+    viewBox="0 0 {viewBoxW * scale} {viewBoxH * scale}"
+    preserveAspectRatio="xMidYMid meet">
+    <g id="sheets">
     {#each $sheets as sheet, index}
         <rect
             class="sheet print"
             id="{sheet.id}"
-            x="{index * sheet.sheet_width}in"
+            x="{index * sheet.sheet_width * scale}"
             y="0"
-            width="{sheet.sheet_width}in"
-            height="{sheet.sheet_height}in"
+            width="{sheet.sheet_width * scale}"
+            height="{sheet.sheet_height * scale}"
         />
     {/each}
+    </g>
+    <g id="panels">
     {#each $panels as panel}
         <rect
             on:mouseover={showSizes}
             on:mouseleave={hideSizes}
             class="panel print"
             id="{panel.id}"
-            x="{panel.x0}in"
-            y="{panel.y0}in"
-            width="{panel.width}in"
-            height="{panel.height}in"
+            x="{panel.x0 * scale}"
+            y="{panel.y0 * scale}"
+            width="{panel.width * scale}"
+            height="{panel.height * scale}"
         />
 
         {#if panel.width > panel.height}
             <text
                 class="idh print"
-                x="{panel.x0 + panel.width / 2}in"
-                y="{panel.y0 + 1 + panel.height / 2}in"
+                x="{(panel.x0 + panel.width / 2) * scale}"
+                y="{(panel.y0 + 1 + panel.height / 2) * scale}"
                 >
             {panel.id}
             </text>
         {:else}
             <text
                 class="idv print"
-                x="{panel.x0 - 0.25 + panel.width / 2}in"
-                y="{panel.y0 + 1 + panel.height / 2}in"
+                x="{(panel.x0 - 0.25 + panel.width / 2) * scale}"
+                y="{(panel.y0 + 1 + panel.height / 2) * scale}"
                 >
             {panel.id}
             </text>
         {/if}
     {/each}
+    </g>
 </svg>
 </div>
