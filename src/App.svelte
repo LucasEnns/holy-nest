@@ -2,7 +2,7 @@
   import Import from "./components/Import.svelte"
   import Viewer from "./components/Viewer.svelte"
   import Info from "./components/Info.svelte"
-  // import { errors } from "./stores.js";
+  import { sheets } from "./stores.js";
 </script>
 
 <style lang="sass">
@@ -15,30 +15,20 @@
       display: grid
       grid-template-rows: 12vh 76vh 12vh
       overflow: hidden
-      // padding: 1rem
 
       .import, .info
-          // height: 150px
           display: flex
-          // width: 80%
-          // flex-direction: column
-          // vertical-align: middle
           align-items: center
           justify-content: space-around
-          // padding: 10px
 
 
-      .viewer
-
-          // position: absolute
-          // top: 12vh
-          // left: 0
-          // bottom: 6vh
-          // right: 0
+      Viewer
           margin: 20px
-          // height: 88vh
-          // width: 1vw
 
+// @media print
+
+//   .import, .info
+//     display: none
 
 </style>
 
@@ -52,12 +42,15 @@
 
     {/each}
   </div> -->
-  <div class="viewer">
+  {#if $sheets.length}
+
+  <!-- <div class="viewer"> -->
 
     <Viewer />
-  </div>
+  <!-- </div> -->
   <div class="info">
 
     <Info />
   </div>
+  {/if}
 </div>

@@ -1,8 +1,18 @@
 <script>
+// TO DO
+// open save print?
+// impliment a list from the csv
+// to choose which panels to nest
+// or change the quantities
+// highlight all similar panels on hover
+
+
    import { Nest } from "../nest.js"
-   import { panels, sheets, errors } from "../stores.js"
-   $: fileName = ""
+   import { panels, sheets, fileInfo } from "../stores.js"
+   import { saveAs } from 'file-saver'
+   $: badFile = false
    let files
+   // gCode = "g00 \ng20"
    $: material = {
       width: 49,
       height: 97,
@@ -13,14 +23,14 @@
    $: units = false
 
 
-
    function showFile() {
       let file = files.files[0]
-      // let textFile = /text\/csv/
       let reader = new FileReader()
-      fileName = file.name.replace('.csv', '')
+      $fileInfo.name = file.name.replace('.csv', '')
+      reader.readAsText(file);
 
-      if ( file.type === 'text/csv' ) {
+      if ( file.name.includes('.csv') ) {
+      // if ( file.type === 'text/csv' ) {
          reader.onload = function (event) {
             let nest = Nest(
                event.target.result, // csv file
@@ -31,15 +41,14 @@
                material
             )
 
+            badFile = false
             $panels = nest[0]
             $sheets = nest[1]
-            $errors = nest[2]
-            if ( $errors.length ) alert( $errors )
+            $fileInfo.errors = nest[2]
          }
       } else {
-         fileName = "file.💩"
+         badFile = true
       }
-      reader.readAsText(file);
    }
 
 </script>
@@ -121,8 +130,17 @@ input[type="number"] {
 
 <div class="upload-wrapper">
    <input class="inputfile" name="file" id="file" type="file" on:change={showFile} bind:this={files} />
-   <label for="file">{fileName == "" ? "Open" : fileName} <img src="./favicon.png" alt="open csv file"></label>
+   <label for="file">
+      {#if !badFile}
+         <img src="./favicon.png" alt="open csv file">
+      {:else}
+         <h1 on:mouseover={() => badFile = false}>💩</h1>
+      {/if}
+   </label>
 </div>
+<!-- <div class="save">
+   <a href="data:text/plain;charset=utf-8,{encodeURIComponent(gCode)}" download="{$sheets[0].id}.cnc">save</a>
+</div> -->
 <div class="input-wrapper">
    <h5>Material W x H</h5>
    <input class="input" type="number" bind:value={material.width} />

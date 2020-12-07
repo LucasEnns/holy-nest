@@ -12,7 +12,7 @@ const fallback = [
 // export const cabinetType = localStore('cabinet-type', "bathroom")
 
 export const panels = localStore('panels', [])
-export const sheets = localStore('sheets', fallback)
-export const errors = localStore('errors', [])
+export const sheets = localStore('sheets', [])
+export const fileInfo = localStore('file-info', {})
 
 // export const inputTemplate = localStore('template', template)

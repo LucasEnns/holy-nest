@@ -9,6 +9,9 @@
 // click sheet shuffle columns
 
 
+// new technique-- class panel widths by +- %
+// if none next is +- 1/2 of width
+
 
 // import { toDECIMAL } from "./methods"
 import { CSVToArray } from "./csv.js";

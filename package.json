@@ -21,7 +21,7 @@
     "svelte-preprocess": "^4.5.1"
   },
   "dependencies": {
-    "file-saver": "^2.0.2",
+    "file-saver": "^2.0.5",
     "sirv-cli": "^0.4.4"
   }
 }
