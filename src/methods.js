@@ -20,4 +20,7 @@ const removeFromArray = (array, itemValue) =>{
     return [...array.slice(0, index), ...array.slice(index + 1)]
 }
 
-console.log(toFloat("16       3//8  "));
+
+export function trunc ( number, places ) {
+    return parseInt( number * ( 10 ** places ) ) / ( 10 ** places )
+}

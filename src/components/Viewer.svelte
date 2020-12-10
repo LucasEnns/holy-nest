@@ -1,5 +1,5 @@
 <script>
-import { panels, sheets, svg } from '../stores.js'
+import { panels, sheets, settings, svg, activePanel } from '../stores.js'
 import { afterUpdate } from 'svelte'
 
 let id,
@@ -12,17 +12,21 @@ let id,
     left = 0,
     scale = 90, // inches to pixels
     svgFile
-$: viewBoxW = $sheets.length * $sheets[0].sheet_width || 61
-$: viewBoxH = $sheets[0].sheet_height || 121
+$:  viewBoxW = $sheets.length * $settings.material.width
+$:  viewBoxH = $settings.material.height
 
 
 afterUpdate(() => {
-    $svg = svgFile.innerHTML.toString()
+    if ( $sheets.length ) {
+        $svg = svgFile.innerHTML.toString()
+    }
 })
 
 
 
 function showSizes() {
+
+    $activePanel = this.id
     checkSize = true
     let rect = this.getBoundingClientRect();
     top = rect.bottom + 12
@@ -34,14 +38,16 @@ function showSizes() {
 
 function hideSizes( event ) {
     checkSize = false
+    $activePanel = ''
 }
 
 </script>
 
 <style>
 .viewer{
-    height: 100%;
-    width: 100%;
+    /* margin: 1rem; */
+
+    height: 76vh;
 }
 .infocard{
     position: fixed;
@@ -69,7 +75,8 @@ function hideSizes( event ) {
         animation: fadeout 0.2s ;
     }
 
-    .panel:hover{
+    /* .panel:hover, */
+    .active{
         fill: lightcoral;
         fill-opacity: 1;
         animation: fadein 0.2s ;
@@ -94,9 +101,9 @@ function hideSizes( event ) {
 }
 
     .sheet{
-        stroke:#ff0;
+        stroke:#fde3b0;
         stroke-width: 15;
-        /* fill: #ff0000; */
+        /* fill: url(#pattern1); */
         fill-opacity: 0;
         }
 
@@ -129,8 +136,8 @@ function hideSizes( event ) {
 {#if checkSize}
 <div class="infocard" style="left: {left}px; top: {top}px;">
     <h4 class="sizes">Panel: {id}</h4>
-    <h4 class="sizes">Width: {width}</h4>
-    <h4 class="sizes">Height: {height}</h4>
+    <h4 class="sizes">Width: {width / scale - $settings.cutter}</h4>
+    <h4 class="sizes">Height: {height / scale - $settings.cutter}</h4>
 </div>
 {/if}
 
@@ -144,6 +151,14 @@ function hideSizes( event ) {
     height="{viewBoxH * scale}"
     viewBox="0 0 {viewBoxW * scale} {viewBoxH * scale}"
     preserveAspectRatio="xMidYMid meet">
+    <!-- <defs>
+        <pattern id="pattern1"
+                 x="0" y="0" width="50" height="60"
+                 patternUnits="userSpaceOnUse" >
+
+            <line x1="0" y1="0" x2="50" y2="30" style="stroke-width: 1px; stroke: #fde3b0;" />
+        </pattern>
+    </defs> -->
     <g id="sheets">
     {#each $sheets as sheet, index}
         <rect
@@ -161,7 +176,7 @@ function hideSizes( event ) {
         <rect
             on:mouseover={showSizes}
             on:mouseleave={hideSizes}
-            class="panel print"
+            class="panel {$activePanel == panel.id ? "active" : ""} print"
             id="{panel.id}"
             x="{panel.x0 * scale}"
             y="{panel.y0 * scale}"

@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 // import YAML from 'yaml';
 
-export const localStore = (key, initial) => {
+export const sessionStore = (key, initial) => {
   // receives the key of the local storage and an initial value
 
   // helper function
@@ -10,13 +10,13 @@ export const localStore = (key, initial) => {
   const toObj = JSON.parse
 
   // item not present in local storage
-  if (localStorage.getItem(key) === null) {
+  if (sessionStorage.getItem(key) === null) {
     // initialize local storage with initial value
-    localStorage.setItem(key, toString(initial))
+    sessionStorage.setItem(key, toString(initial))
   }
 
   // convert to object
-  const saved = toObj(localStorage.getItem(key))
+  const saved = toObj(sessionStorage.getItem(key))
 
   // create the underlying writable store
   const { subscribe, set, update } = writable(saved)
@@ -25,7 +25,7 @@ export const localStore = (key, initial) => {
     subscribe,
     set: (value) => {
       // save also to local storage as a string
-      localStorage.setItem(key, toString(value))
+      sessionStorage.setItem(key, toString(value))
       return set(value)
     },
     update

@@ -1,6 +1,7 @@
 <script>
   import Import from "./components/Import.svelte"
   import Viewer from "./components/Viewer.svelte"
+  import CSV from "./components/CSV.svelte"
   import Info from "./components/Info.svelte"
   import { sheets } from "./stores.js";
 </script>
@@ -16,14 +17,19 @@
       grid-template-rows: 12vh 76vh 12vh
       overflow: hidden
 
-      .import, .info
+      .info
           display: flex
           align-items: center
-          justify-content: space-around
+          justify-content: space-evenly
+
+  .main, .import
+    position: relative
+    margin: 0 1vw
+    display: grid
+    grid-template-columns: minmax(200px, 18vw)  1fr
+    // height: 76vh
 
 
-      Viewer
-          margin: 20px
 
 // @media print
 
@@ -44,10 +50,10 @@
   </div> -->
   {#if $sheets.length}
 
-  <!-- <div class="viewer"> -->
-
+  <div class="main">
+    <CSV />
     <Viewer />
-  <!-- </div> -->
+  </div>
   <div class="info">
 
     <Info />

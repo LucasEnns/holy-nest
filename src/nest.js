@@ -18,7 +18,6 @@
 
 
 // import { toDECIMAL } from "./methods"
-import { CSVToArray } from "./csv.js";
 
 let CUTTER = 0.375         // end mill diameter used to space panels
 let GAP = 0                // gap + bit size = total space
@@ -27,8 +26,8 @@ let MATERIAL = {           // sheet size and options
         width: 49,
         height: 97,
         margins: 0.25,
-        max_width: () => MATERIAL.width - MATERIAL.margins * 2 + CUTTER,
-        max_height: () => MATERIAL.height - MATERIAL.margins * 2 + CUTTER
+        max_width: () => MATERIAL.width - MATERIAL.margins * 2 - CUTTER,
+        max_height: () => MATERIAL.height - MATERIAL.margins * 2 - CUTTER
     }
 
 export function Nest( panels,
@@ -41,24 +40,28 @@ export function Nest( panels,
 
     function panelArrayCreator() {
         // console.log(CSVToArray( panels ));
-        return new List( CSVToArray( panels )
+        return new List( panels
                 .slice( firstPanelRow )
                 .flatMap( i => {
                     return quantityIDs( i ).map( i => new Panel( i ) ) } )
             )
             .flat()
-            .filterTooBig()
     }
 
     function quantityIDs( [ id, quantity, width, height ] ) {
+        if ( width > MATERIAL.max_width() ||
+            height > MATERIAL.max_height() ) {
+                ERRORS.push(`Panel ${id} is too big`)
+                return []
+        }
         let n = 1, uniqueIDs = []
         while ( quantity >= n ) {
-            uniqueIDs.push( [ `${id} (${n}/${quantity})`, parseFloat(width), parseFloat(height) ] )
+            uniqueIDs.push( [ `${id} | ${n} of ${quantity}`, id, parseFloat(width), parseFloat(height) ] )
             n++
         }
-        // console.log(uniqueIDs);
         return uniqueIDs
     }
+
 
     ERRORS = []
     const PANELS = panelArrayCreator()          // raw csv panel input converted
@@ -69,7 +72,6 @@ export function Nest( panels,
     MATERIAL.width = material.width
     MATERIAL.height = material.height
     MATERIAL.margins = material.margins
-
 
 
     function fillColumn( panels ) {
@@ -197,8 +199,9 @@ class Placement {
 }
 
 class Panel extends Placement {
-    constructor( [ id, width, height ] ) {
+    constructor( [ uniqueID, id, width, height ] ) {
         super()
+        this.uniqueID = uniqueID
         this.id = id
         this.width = width + CUTTER + GAP
         this.height = height + CUTTER + GAP
@@ -272,17 +275,6 @@ class List extends Array {
             .sort(( a, b ) => b.height != a.height ?
                 b.height - a.height :
                 b.width - a.width)
-    }
-    filterTooBig() {
-        return this.map(panel => {
-                if ( panel.width > MATERIAL.max_width() ||
-                     panel.height > MATERIAL.max_height() ) {
-                    ERRORS.push(`Panel ${panel.id} is too big`)
-                    return false
-                }
-                return panel
-            })
-            .filter(panel => panel) // removes empty entry
     }
     // methods to find unplaced panels
     notPlaced() {

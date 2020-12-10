@@ -1,18 +1,23 @@
 <script>
-import { sheets, fileInfo } from '../stores.js'
+import { sheets, csvFile } from '../stores.js'
+import { trunc } from "../methods.js";
 </script>
 
 <style>
 div {
     font-size: 0.75em;
-    line-height: 1em;
-    /* vertical-align: bottom; */
+    line-height: 1.5em;
+    /* vertical-align: 0; */
+}
+sup {
+    font-size: .5em;
+    line-height: 1.5em;
+    /* vertical-align: .4em */
 }
 </style>
 
 <div>
-    {#if $fileInfo.name}
-        <h2>{$fileInfo.name}</h2>
+    {#if $csvFile.name}
         {#if $sheets.length > 1}
             <p>filled sheets</p>
             <p>waste: {parseInt($sheets
@@ -27,17 +32,8 @@ div {
 {#each $sheets as sheet, index}
     <div>
         <h4>{sheet.id}</h4>
-        <p>used area: {parseInt(sheet.area)}</p>
-        <p>waste area: {parseInt(sheet.waste_area)}</p>
-        <p>waste: {parseInt(sheet.waste_ratio * 100)}%</p>
+        <p>used area: {trunc( sheet.area / 144, 2)} pi<sup>2</sup></p>
+        <p>waste area: {trunc(sheet.waste_area / 144, 2)} pi<sup>2</sup></p>
+        <p>waste: {trunc(sheet.waste_ratio * 100, 2)}%</p>
     </div>
 {/each}
-
-<div>
-    {#if $fileInfo.errors.length}
-        <h5>ERROR{$fileInfo.errors.length > 1 ? "S" : ""}:</h5>
-        {#each $fileInfo.errors as error}
-            <p>{error}</p>
-        {/each}
-    {/if}
-</div>
