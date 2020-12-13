@@ -22,8 +22,6 @@ afterUpdate(() => {
     }
 })
 
-
-
 function showSizes() {
 
     $activePanel = this.id
@@ -133,14 +131,14 @@ function hideSizes( event ) {
 
 </style>
 
-{#if checkSize}
+<!-- {#if checkSize}
 <div class="infocard" style="left: {left}px; top: {top}px;">
     <h4 class="sizes">Panel: {id}</h4>
     <h4 class="sizes">Width: {width / scale - $settings.cutter}</h4>
     <h4 class="sizes">Height: {height / scale - $settings.cutter}</h4>
 </div>
 {/if}
-
+ -->
 
 <div class="viewer"    bind:this={svgFile}>
 <svg class="print"
@@ -150,58 +148,39 @@ function hideSizes( event ) {
     width="{viewBoxW * scale}"
     height="{viewBoxH * scale}"
     viewBox="0 0 {viewBoxW * scale} {viewBoxH * scale}"
-    preserveAspectRatio="xMidYMid meet">
-    <!-- <defs>
-        <pattern id="pattern1"
-                 x="0" y="0" width="50" height="60"
-                 patternUnits="userSpaceOnUse" >
+    preserveAspectRatio="xMidYMid meet" >
 
-            <line x1="0" y1="0" x2="50" y2="30" style="stroke-width: 1px; stroke: #fde3b0;" />
-        </pattern>
-    </defs> -->
-    <g id="sheets">
     {#each $sheets as sheet, index}
-        <rect
-            class="sheet print"
-            id="{sheet.id}"
-            x="{index * sheet.sheet_width * scale}"
-            y="0"
-            width="{sheet.sheet_width * scale}"
-            height="{sheet.sheet_height * scale}"
-        />
-    {/each}
-    </g>
-    <g id="panels">
-    {#each $panels as panel}
-        <rect
-            on:mouseover={showSizes}
-            on:mouseleave={hideSizes}
-            class="panel {$activePanel == panel.id ? "active" : ""} print"
-            id="{panel.id}"
-            x="{panel.x0 * scale}"
-            y="{panel.y0 * scale}"
-            width="{panel.width * scale}"
-            height="{panel.height * scale}"
-        />
+        <g id="sheets">
+            <rect
+                class="sheet print"
+                id="{sheet.id}"
+                x="{index * sheet.sheet_width * scale}"
+                y="0"
+                width="{sheet.sheet_width * scale}"
+                height="{sheet.sheet_height * scale}" />
+        </g>
+        <g id="panels">
+            {#each sheet.group as panel}
+                <rect
+                    on:mouseover={showSizes}
+                    on:mouseleave={hideSizes}
+                    class="panel {$activePanel == panel.id ? "active" : ""} print"
+                    id="{panel.id}"
+                    x="{(panel.x0 + index * sheet.sheet_width) * scale}"
+                    y="{panel.y0 * scale}"
+                    width="{panel.width * scale}"
+                    height="{panel.height * scale}" />
 
-        {#if panel.width > panel.height}
-            <text
-                class="idh print"
-                x="{(panel.x0 + panel.width / 2) * scale}"
-                y="{(panel.y0 + 1 + panel.height / 2) * scale}"
-                >
-            {panel.id}
-            </text>
-        {:else}
-            <text
-                class="idv print"
-                x="{(panel.x0 - 0.25 + panel.width / 2) * scale}"
-                y="{(panel.y0 + 1 + panel.height / 2) * scale}"
-                >
-            {panel.id}
-            </text>
-        {/if}
+                    <text
+                        class="idh print"
+                        x="{(panel.x0 + panel.width / 2 + index * sheet.sheet_width) * scale}"
+                        y="{(panel.y0 + 1 + panel.height / 2) * scale}">
+                    {panel.id}
+                    </text>
+            {/each}
+        </g>
     {/each}
-    </g>
+
 </svg>
 </div>

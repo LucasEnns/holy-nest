@@ -48,7 +48,7 @@
 
     {/each}
   </div> -->
-  {#if $sheets.length}
+  <!-- {#if $sheets.length} -->
 
   <div class="main">
     <CSV />
@@ -58,5 +58,5 @@
 
     <Info />
   </div>
-  {/if}
+  <!-- {/if} -->
 </div>

@@ -24,3 +24,18 @@ const removeFromArray = (array, itemValue) =>{
 export function trunc ( number, places ) {
     return parseInt( number * ( 10 ** places ) ) / ( 10 ** places )
 }
+
+
+export function formatDate(date, format) {
+    const map = {
+        mm: date.getMonth() + 1,
+        dd: date.getDate(),
+        yy: date.getFullYear().toString().slice(-2),
+        yyyy: date.getFullYear(),
+        H: date.getHours(),
+        M: date.getMinutes(),
+        S: date.getSeconds(),
+    }
+
+    return format.replace(/mm|dd|yy|yyyy|H|M|S/gi, matched => map[matched])
+}

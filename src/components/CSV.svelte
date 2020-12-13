@@ -5,7 +5,8 @@
     // import Import from "./Import.svelte";
     import { beforeUpdate } from 'svelte'
 
-    $: lines = $csvFile.contents.slice(4)
+    const csvHeaderRows = 5
+    $: lines = $csvFile.contents.slice(csvHeaderRows)
 
 //    beforeUpdate(() => {
 //       if ( $csvFile.contents ) {
@@ -13,10 +14,14 @@
 //       }
 //     })
 
+function highlight() {
+    this.select()
+}
+
     function calculateNest() {
       let nest = Nest(
             $csvFile.contents,
-            4,                   // panel starting row csv
+            csvHeaderRows,                   // panel starting row csv
             $settings.units,
             $settings.cutter,
             $settings.gap,
@@ -35,7 +40,7 @@
     // }
 
     function addRow() {
-        let row = [$csvFile.contents.slice(4).length + 1, 0, 0, 0]
+        let row = [lines.length + 1, , , ]
         $csvFile.contents = [...$csvFile.contents, row]
     }
 
@@ -79,6 +84,14 @@ ul{
     font-size: 1.1em;
     display: grid;
     grid-template-columns: 3fr 2fr 4fr 4fr 1fr;
+}
+.new-row{
+    font-size: 2.5em;
+    cursor: pointer;
+    text-align: center;
+}
+.new-row{
+    color: #4bbdff;
 }
 .active{
     background-color: rgba(240, 128, 128, 0.371);
@@ -132,10 +145,7 @@ div {
                 {/each}
             {/if}
 
-            <h1>{$csvFile.contents[0][1]}
-                <span on:click={addRow}>+</span>
-                <!-- <span on:click={reset}>↺</span> -->
-            </h1>
+            <h1>{$csvFile.contents[0][1]}</h1>
 
 
             <ul>
@@ -154,28 +164,35 @@ div {
                         <input
                             type="text"
                             bind:value={line[0]}
+                            on:focus="{highlight}"
                             on:keyup={calculateNest} />
                     </li>
                     <li>
                         <input
                             type="number"
                             bind:value={line[1]}
+                            on:focus="{highlight}"
                             on:keyup={calculateNest}  />
                     </li>
                     <li>
                         <input
                             type="number"
                             bind:value={line[2]}
-                            on:keyup={calculateNest}  />
+                            on:focus="{highlight}"
+                            on:keyup={calculateNest}
+                            step="0.03125" />
                     </li>
                     <li>
                         <input
                             type="number"
                             bind:value={line[3]}
-                            on:keyup={calculateNest}  />
+                            on:focus="{highlight}"
+                            on:keyup={calculateNest}
+                            step="0.03125" />
                     </li>
                 </ul>
             {/each}
         {/if}
+        <ul class="new-row" on:click={addRow}>+</ul>
     </div>
 </div>

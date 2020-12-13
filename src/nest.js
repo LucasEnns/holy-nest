@@ -43,9 +43,10 @@ export function Nest( panels,
         return new List( panels
                 .slice( firstPanelRow )
                 .flatMap( i => {
-                    return quantityIDs( i ).map( i => new Panel( i ) ) } )
-            )
-            .flat()
+                    return quantityIDs( i ).map( i => new Panel( i )
+                    )
+                } )
+            ).flat()
     }
 
     function quantityIDs( [ id, quantity, width, height ] ) {
@@ -53,10 +54,12 @@ export function Nest( panels,
             height > MATERIAL.max_height() ) {
                 ERRORS.push(`Panel ${id} is too big`)
                 return []
-        }
+        } else if ( !width || !height || !quantity ) return []
         let n = 1, uniqueIDs = []
         while ( quantity >= n ) {
-            uniqueIDs.push( [ `${id} | ${n} of ${quantity}`, id, parseFloat(width), parseFloat(height) ] )
+            let q = ""
+            if ( quantity > 1 ) q =  ` ... ${n} of ${quantity}`
+            uniqueIDs.push( [ id + q , id, parseFloat(width), parseFloat(height) ] )
             n++
         }
         return uniqueIDs
@@ -141,7 +144,8 @@ export function Nest( panels,
     }
 
     function addCoordinates( columns, multiplier ) {
-        let startX = MATERIAL.margins + MATERIAL.width * multiplier
+        // let startX = MATERIAL.margins + MATERIAL.width * multiplier
+        let startX = MATERIAL.margins
         let startY = MATERIAL.margins
         // start X and Y for svg output with multiple sheets
 

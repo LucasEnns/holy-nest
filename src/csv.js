@@ -1,4 +1,4 @@
-export function CSVToArray( strData, strDelimiter = "," ) {
+export function CSVToArray( strData, headerRows = 1, strDelimiter = "," ) {
 
     // Create a regular expression to parse the CSV values.
     var regexPattern = new RegExp( (
@@ -59,8 +59,12 @@ export function CSVToArray( strData, strDelimiter = "," ) {
     }
 
     // Return the parsed data.
-    return arrData.filter( item =>
-                item.filter( inner => inner !== "" ).length )
+    return arrData.filter( ( item, index ) => {
+        // keep all header rows
+            if ( index < headerRows ) return true
+        // removes blanc rows thereafter
+            return item.filter( inner => inner !== "" ).length
+        } )
 }
 function hasNumber( str ) {
     return /\d/.test( str );
