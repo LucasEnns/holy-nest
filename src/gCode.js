@@ -2,7 +2,7 @@
 // TO DO
 //////////////////////////////////////////////////////
 // add support for tool library
-
+//  svg path UPPERCASE = G90 lowercase = G91
 
 import { formatDate } from "./methods.js";
 
@@ -16,33 +16,38 @@ let Y_HOME = 120.0
 let SAFE_HEIGHT = 1
 let CUT_TO_DEPTH = 0
 
-function HEADER( tool, speed, fileName ) {
+function HEADER( tool, speed, fileName, sheets ) {
     return [
         `( ${fileName} )`,
-        `( ${formatDate(new Date(), 'yyyy/mm/dd H:M')} )`,
-        `G40 G80 G91 G28 Z0`,
-        `G70`,
-        `M6 T${tool}`,
-        `S${speed} M3`,
-        `G54 G90`,
-        `G43 H${tool}`
+        // `( ${sheets} sheets to cut )`,
+        `( ${sheets} feuilles a couper )`,
+        `( ${formatDate(new Date(), 'dd/mm/yyyy H:M')} )`,
+        `G40 G80 G70`,
+        // `G91 G28 Z0`,
+        `M06 T${tool}`,
+        `G43 H${tool}`,
+        `S${speed} M03`,
+        `G54 G90`
     ]
 }
 function TOOL_CHANGE( tool, speed ) {
     return [
         `M05`,
-        `G91 G28 Z0`,
+        // `G91 G28 Z0`,
         `T${tool}`,
-        `G00 G90 G54 S${speed} M3`,
+        `G00 G90 G54 S${speed} M03`,
         `G43 H${tool}`
     ]
 }
 function SHEET_CHANGE( x, y ) {
     return [
-        `M05`,
+        `M05 M104`,
         `G90 X${addPoint(x)} Y${addPoint(y)}`,
         `M00`,
-        `( Add new sheet and press cycle start :)`
+        // `( Load next sheet and )`,
+        `( changez la feuille et )`,
+        `( cycle start :)`,
+        `M103 M03`
     ]
 }
 function FOOTER() {
@@ -67,17 +72,18 @@ function addPoint ( num ) {
 }
 
 export function Gcode( sheets, material ,fileName ) {
-    SAFE_HEIGHT = material.thickness + 0.5
     X_HOME = material.width / 2
     Y_HOME = material.height + 10 // add limit to 122"
-    let output = [ ...HEADER( TOOL_NUMBER, SPINDLE_SPEED, fileName ) ]
+    let output = [
+        ...HEADER( TOOL_NUMBER, SPINDLE_SPEED, fileName, sheets.length )
+    ]
     sheets.forEach( sheet => {
         output.push(`( ${sheet.id} )`)
         sheet.columns.forEach( (column, index) => {
             column.group.flat().sort(( a, b ) => index % 2 !== 0 ?
                 a.y0 != b.y0 : b.y0 != a.y0 ?
                 b.y0 - a.y0 : b.x0 - a.x0)
-            .forEach( panel => output.push( profileCut( panel ) ))
+            .forEach( panel => output.push( profileCut( panel, material ) ))
         })
         output.push( SHEET_CHANGE( X_HOME, Y_HOME ) )
     })
@@ -86,7 +92,9 @@ export function Gcode( sheets, material ,fileName ) {
     return output.flat().join('\n')
 }
 
-function profileCut( panel ) {
+function profileCut( panel, material ) {
+    SAFE_HEIGHT = material.thickness + 0.25
+
     const { x0, y0, width, height } = panel
     let x_ = x0 + width
     let y_ = y0 + height
@@ -94,7 +102,9 @@ function profileCut( panel ) {
     let yEnd = yStart + SAFE_HEIGHT
 
     return [
-        `( cutting panel ${panel.uniqueID} )`,
+        // `( cutting panel ${panel.id} )`,
+        `( coupe panneau ${panel.id} )`,
+        `( ${panel.uniqueID} )`,
         RAPID_MOVE( x0, yStart, SAFE_HEIGHT ),
         PLUNGE_MOVE( x0, yEnd, CUT_TO_DEPTH, PLUNGE_RATE ),
         FEED_MOVE( x0, y_, CUT_TO_DEPTH, FEED_RATE ),
@@ -102,6 +112,8 @@ function profileCut( panel ) {
         MOVE_Y( y0 ),
         MOVE_X( x0 ),
         MOVE_Y( yEnd ),
-        RETRACT_MOVE( SAFE_HEIGHT )
+        RETRACT_MOVE( SAFE_HEIGHT ),
+        // `( finished panel ${panel.id} )`,
+        `( fin panneau ${panel.id} )`
     ]
 }

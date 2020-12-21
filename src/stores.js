@@ -22,6 +22,7 @@ let placementSettings = {
 
 export const blancCSV = {
   name: formatDate( new Date(), 'yymmdd-HM' ),
+  // name: formatDate( new Date(), 'yymmdd-HM' ),
   errors: [],
   contents: [
     ['Project name:', 'New'],

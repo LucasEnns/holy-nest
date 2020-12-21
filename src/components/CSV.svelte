@@ -8,12 +8,6 @@
     const csvHeaderRows = 5
     $: lines = $csvFile.contents.slice(csvHeaderRows)
 
-//    beforeUpdate(() => {
-//       if ( $csvFile.contents ) {
-//          calculateNest()
-//       }
-//     })
-
 function highlight() {
     this.select()
 }
@@ -53,24 +47,24 @@ function highlight() {
     }
 
 
-// autoselect on focus?
 </script>
 
 
 <style>
-.container {
+.wrapper {
     /* position: relative; */
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
     overflow-y: scroll;
+    margin-right: 1vw;
     /* vertical-align: middle; */
 }
-h1{
+/* h1{ */
     /* position: relative; */
     /* top: -3em; */
-    padding: 1.5em 0;
-}
+    /* padding: 1.5em 0;
+} */
 /* span{
     font-size: 1.5em;
     vertical-align: middle;
@@ -83,7 +77,8 @@ span:hover{
 ul{
     font-size: 1.1em;
     display: grid;
-    grid-template-columns: 3fr 2fr 4fr 4fr 1fr;
+    grid-template-columns: 3fr 2fr 4fr 4fr;
+    border-bottom: 1px solid;
 }
 .new-row{
     font-size: 2.5em;
@@ -94,7 +89,7 @@ ul{
     color: #4bbdff;
 }
 .active{
-    background-color: rgba(240, 128, 128, 0.371);
+    background-color: rgba(128, 167, 240, 0.371);
 }
 li {
     line-height: 2.5em;
@@ -104,37 +99,22 @@ li {
 li:hover {
     text-decoration: overline;
 }
- input[type="number"]::-webkit-outer-spin-button,
- input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-input:hover, input:focus {
-    color: #75cafc;
-    border-bottom: #e7fc75 solid 1px;
-}
+
 input{
-    text-align: center;
-    width: 80%;
-    /* font-size: 1.15em; */
-    border: none;
-    background: none;
-    font-family: Overpass;
-    font-weight: 200;
-    color: #fde3b0;
-    border-bottom: transparent solid 1px;
-    outline: none;
+    width: 100%;
+    height: 100%;
 }
-input[type="number"] {
-    -moz-appearance: textfield;
+.title {
+    column-span: 3;
 }
+
 div {
     font-size: 0.8em;
     /* vertical-align: bottom; */
 }
 </style>
 
-<div class="container">
+<div class="wrapper">
     <div>
         {#if $csvFile.name}
 
@@ -145,7 +125,16 @@ div {
                 {/each}
             {/if}
 
-            <h1>{$csvFile.contents[0][1]}</h1>
+            <ul>
+                <li>
+                PROJECT:
+                </li>
+                <li></li>
+                <li>
+                <input class="title" type="text" bind:value="{$csvFile.contents[0][1]}" />
+            </li>
+
+            </ul>
 
 
             <ul>

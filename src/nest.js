@@ -52,14 +52,16 @@ export function Nest( panels,
     function quantityIDs( [ id, quantity, width, height ] ) {
         if ( width > MATERIAL.max_width() ||
             height > MATERIAL.max_height() ) {
-                ERRORS.push(`Panel ${id} is too big`)
+                ERRORS.push(`Panneau ${id} est trop gros`)
+                // ERRORS.push(`Panel ${id} is too big`)
                 return []
         } else if ( !width || !height || !quantity ) return []
         let n = 1, uniqueIDs = []
         while ( quantity >= n ) {
             let q = ""
-            if ( quantity > 1 ) q =  ` ... ${n} of ${quantity}`
-            uniqueIDs.push( [ id + q , id, parseFloat(width), parseFloat(height) ] )
+            if ( quantity > 1 ) q = `${n} sur ${quantity}`
+            // if ( quantity > 1 ) q = `${n} of ${quantity}`
+            uniqueIDs.push( [ q , id, parseFloat(width), parseFloat(height) ] )
             n++
         }
         return uniqueIDs
@@ -234,7 +236,8 @@ class Sheet extends Column {
         this.sheet_area = MATERIAL.width * MATERIAL.height
         this.waste_area = this.sheet_area - this.area
         this.waste_ratio = 1 - this.area / this.sheet_area
-        this.id = "Sheet " + id
+        this.id = "Feuille " + id
+        // this.id = "Sheet " + id
         delete this.placed
     }
 }
