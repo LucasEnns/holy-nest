@@ -39,26 +39,32 @@ function TOOL_CHANGE( tool, speed ) {
 }
 function SHEET_CHANGE( x, y ) {
     return [
-        `G0 G90 X${x} Y${y}`,
+        `M05`,
+        `G90 X${addPoint(x)} Y${addPoint(y)}`,
         `M00`,
-        `(Add new sheet and press cycle start:)`
+        `( Add new sheet and press cycle start :)`
     ]
 }
 function FOOTER() {
     return [
         `G40 G80 G91 G28 Z0 M5`,
-        `G0 G90 X${X_HOME} Y${Y_HOME}`,
+        `G00 G90 X${addPoint(X_HOME)} Y${addPoint(Y_HOME)}`,
         `M30`
     ]
 }
-function RAPID_MOVE( x, y, z ) { return `G00 X${x} Y${y} Z${z}` }
-function RETRACT_MOVE( z ) { return `G00 Z${z}` }
-function PLUNGE_MOVE( x, y, z, f ) { return `G01 X${x} Y${y} Z${z} F${f}` }
-function FEED_MOVE( x, y, z, f ) { return `G01 X${x} Y${y} Z${z} F${f}` }
-function MOVE( x, y, z ) { return `X${x} Y${y} Z${z}` }
-function MOVE_X( x ) { return `X${x}` }
-function MOVE_Y( y ) { return `Y${y}` }
-function MOVE_Z( z ) { return `Z${z}` }
+function RAPID_MOVE( x, y, z ) { return `G00 X${addPoint(x)} Y${addPoint(y)} Z${addPoint(z)}` }
+function RETRACT_MOVE( z ) { return `G00 Z${addPoint(z)}` }
+function PLUNGE_MOVE( x, y, z, f ) { return `G01 X${addPoint(x)} Y${addPoint(y)} Z${addPoint(z)} F${f}` }
+function FEED_MOVE( x, y, z, f ) { return `G01 X${addPoint(x)} Y${addPoint(y)} Z${addPoint(z)} F${f}` }
+function MOVE( x, y, z ) { return `X${addPoint(x)} Y${addPoint(y)} Z${addPoint(z)}` }
+function MOVE_X( x ) { return `X${addPoint(x)}` }
+function MOVE_Y( y ) { return `Y${addPoint(y)}` }
+function MOVE_Z( z ) { return `Z${addPoint(z)}` }
+
+function addPoint ( num ) {
+    if ( /\./.test( num ) || num === 0 ) return num
+    return num.toFixed(1)
+}
 
 export function Gcode( sheets, material ,fileName ) {
     SAFE_HEIGHT = material.thickness + 0.5
@@ -84,8 +90,8 @@ function profileCut( panel ) {
     const { x0, y0, width, height } = panel
     let x_ = x0 + width
     let y_ = y0 + height
-    let yStart = y0 + 5
-    let yEnd = yStart + 1
+    let yStart = y0 + height / 5
+    let yEnd = yStart + SAFE_HEIGHT
 
     return [
         `( cutting panel ${panel.uniqueID} )`,

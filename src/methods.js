@@ -1,17 +1,26 @@
-function toFloat( str ) {
-    if (!isNaN(str)) return parseFloat(str) // if number return float
-    if (str.includes("/") && !str.includes(".")) {
+export function toFloat( str ) {
+    const float4 = ( str ) => parseFloat( parseFloat(str).toFixed(4) )
+    if ( !isNaN( str ) ) return float4( str ) // if number return float
+    if ( str.includes("/") && !str.includes(".") ) {
         return str
-            .split(" ")
-            .filter(item => item !== "") // for multiple spaces
-            .reduce( ( total, item ) => {
+            .split(" ") // covert rational string into array
+            .filter( item => item !== "" ) // removes multiple spaces
+            .reduce( ( total, item ) => { // get array total of whole # + fraction
                 if ( item.includes("/") ) {
-                    let frac = item.split("/").filter(item => item !== "")
-                    return total + parseFloat(frac[0] / frac[1])}
-                return total + parseFloat(item)
-                }, 0 )
+                    let frac = item.split("/").filter( item => item !== "" )
+                    return total + float4( frac[0] / frac[1] )
+                }
+                return total + float4( item )
+            }, 0 )
     }
-    return "error"
+    return str
+}
+
+export function hasNumber( str ) {
+    return /\d/.test( str );
+}
+export function isNumber( str ) {
+    return /(\.|\/)\d/.test( str );
 }
 
 

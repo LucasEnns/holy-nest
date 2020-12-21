@@ -68,15 +68,16 @@ function hideSizes( event ) {
     .panel{
         stroke: #0cf;
         stroke-width: 5;
-        fill: lightcoral;
+        fill: #80ccf0;
         fill-opacity: 0;
-        animation: fadeout 0.2s ;
+        animation: fadeout 0.1s ;
     }
 
     /* .panel:hover, */
     .active{
-        fill: lightcoral;
+        fill: #80ccf0;
         fill-opacity: 1;
+        stroke: #333;
         animation: fadein 0.2s ;
         }
 
@@ -173,7 +174,7 @@ function hideSizes( event ) {
                     height="{panel.height * scale}" />
 
                     <text
-                        class="idh print"
+                        class="idh {$activePanel == panel.id ? "active" : ""} print"
                         x="{(panel.x0 + panel.width / 2 + index * sheet.sheet_width) * scale}"
                         y="{(panel.y0 + 1 + panel.height / 2) * scale}">
                     {panel.id}
