@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable } from 'svelte/store'
 // import YAML from 'yaml';
 
 export const sessionStore = (key, initial) => {
@@ -28,6 +28,6 @@ export const sessionStore = (key, initial) => {
       sessionStorage.setItem(key, toString(value))
       return set(value)
     },
-    update
+    update,
   }
 }
