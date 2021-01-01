@@ -53,7 +53,7 @@ function highlight() {
 /* .close {
   text-align: end;
 } */
-h1 {
+/* h1 {
   min-width: 100%;
   padding-top: 2vh;
   padding-right: 100%;
@@ -64,8 +64,8 @@ h1 {
 h2 {
   padding-top: 1vh;
   text-transform: uppercase;
-  /* font-size: var(--xlarge); */
-}
+  font-size: var(--xlarge);
+} */
 h3 {
   font-weight: 300;
   font-style: italic;
