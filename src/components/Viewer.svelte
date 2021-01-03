@@ -167,16 +167,16 @@ svg {
             on:mouseleave="{panelHoverOff}"
             class="panel {$activePanel == panel.id ? 'active' : ''} print"
             id="{panel.id}"
-            x="{(panel.x0 + shift(index).x) * scale}"
-            y="{(flipY(panel.y0, panel.height) + shift(index).y) * scale}"
+            x="{(panel.x + shift(index).x) * scale}"
+            y="{(flipY(panel.y, panel.height) + shift(index).y) * scale}"
             width="{panel.width * scale}"
             height="{panel.height * scale}"></rect>
 
           <text
             style="font-size: {Math.min(panel.height * 0.8, 5) * scale}px;"
             class="id {$activePanel == panel.id ? 'active' : ''} print"
-            x="{(panel.x0 + shift(index).x + panel.width / 2) * scale}"
-            y="{(flipY(panel.y0, panel.height) + shift(index).y + Math.min(panel.height * 0.8, 5) / 3 + panel.height / 2) * scale}">
+            x="{(panel.x + shift(index).x + panel.width / 2) * scale}"
+            y="{(flipY(panel.y, panel.height) + shift(index).y + Math.min(panel.height * 0.8, 5) / 3 + panel.height / 2) * scale}">
             {panel.id}
           </text>
         {/each}

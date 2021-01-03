@@ -17,11 +17,10 @@ function calculateNest() {
   let nest = Nest(
     $csvFile.contents,
     csvHeaderRows, // panel starting row csv
-    $settings.placementType,
-    $settings.units,
-    $settings.direction,
+    $settings.nestTypeColumn,
+    $settings.nestOrder,
+    $settings.nestDirectionBottom,
     $settings.cnc[$settings.tool].diameter,
-    $settings.gap,
     $settings.material
   )
   $panels = nest[0]

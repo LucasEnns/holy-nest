@@ -96,15 +96,7 @@ export function Gcode(sheets, material, fileName) {
     sheet.columns.forEach((column, index) => {
       column.group
         .flat()
-        .sort((a, b) =>
-          index % 2 === 0
-            ? b.y0 !== a.y0
-              ? b.y0 - a.y0
-              : a.x0 - b.x0
-            : a.y0 !== b.y0
-            ? a.y0 - b.y0
-            : b.x0 - a.x0
-        )
+        .sort((a, b) => columnSort(a, b, index))
         .forEach((panel) => output.push(profileCut(panel, material)))
     })
     output.push(SHEET_CHANGE(X_HOME, Y_HOME))
@@ -114,25 +106,35 @@ export function Gcode(sheets, material, fileName) {
   return output.flat().join('\n')
 }
 
+function columnSort(a, b, i) {
+  i % 2 === 0
+    ? b.y !== a.y
+      ? b.y - a.y
+      : a.x - b.x
+    : a.y !== b.y
+    ? a.y - b.y
+    : b.x - a.x
+}
+
 function profileCut(panel, material) {
   SAFE_HEIGHT = material.thickness + 0.25
 
-  const { x0, y0, width, height } = panel
-  let x_ = x0 + width
-  let y_ = y0 + height
-  let yStart = y0 + height / 5
+  const { x, y, width, height } = panel
+  let x_ = x + width
+  let y_ = y + height
+  let yStart = y + height / 5
   let yEnd = yStart + SAFE_HEIGHT
 
   return [
     // `( cutting panel ${panel.id} )`,
     `( coupe panneau ${panel.id} )`,
     `( ${panel.uniqueID} )`,
-    RAPID_MOVE(x0, yStart, SAFE_HEIGHT),
-    PLUNGE_MOVE(x0, yEnd, CUT_TO_DEPTH, PLUNGE_RATE),
-    FEED_MOVE(x0, y_, CUT_TO_DEPTH, FEED_RATE),
+    RAPID_MOVE(x, yStart, SAFE_HEIGHT),
+    PLUNGE_MOVE(x, yEnd, CUT_TO_DEPTH, PLUNGE_RATE),
+    FEED_MOVE(x, y_, CUT_TO_DEPTH, FEED_RATE),
     MOVE_X(x_),
-    MOVE_Y(y0),
-    MOVE_X(x0),
+    MOVE_Y(y),
+    MOVE_X(x),
     MOVE_Y(yEnd),
     RETRACT_MOVE(SAFE_HEIGHT),
     // `( finished panel ${panel.id} )`,

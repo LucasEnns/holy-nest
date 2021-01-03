@@ -96,7 +96,8 @@ select {
   padding-left: 1rem;
   width: 10rem;
   font-weight: 100;
-  /* font-family: Overpass; */
+  font-family: Quicksand, sans-serif;
+  letter-spacing: 0.05rem;
   color: var(--primary);
   background-color: var(--primary-bg);
   outline: none;
@@ -144,6 +145,8 @@ input[type='checkbox'] {
   left: 0;
   right: 0;
   bottom: 0;
+  vertical-align: middle;
+  /* padding-bottom: 0.2rem; */
   /* background-color: #8ffffd; */
   -webkit-transition: 0.2s;
   transition: 0.2s;
@@ -196,17 +199,17 @@ input:checked + .units:after {
   content: 'mm';
 }
 
-.direction {
+.direction,
+.type {
   border: none;
 }
-.direction:before {
+.direction:before,
+.type:before {
   opacity: 0;
 }
 .direction:after {
   content: 'Top';
   text-decoration: overline;
-  /* border: 1px solid var(--primary); */
-  /* border-bottom: none; */
 }
 .direction[data-lang*='fr']:after {
   content: 'Haut';
@@ -214,11 +217,21 @@ input:checked + .units:after {
 input:checked + .direction:after {
   content: 'Bottom';
   text-decoration: underline;
-  /* border: 1px solid var(--primary); */
-  /* border-top: none; */
 }
 input:checked + .direction[data-lang*='fr']:after {
   content: 'Bas';
+}
+.type:after {
+  content: 'Row';
+}
+.type[data-lang*='fr']:after {
+  content: 'Row';
+}
+input:checked + .type:after {
+  content: 'Column';
+}
+input:checked + .type[data-lang*='fr']:after {
+  content: 'Column';
 }
 input[type='checkbox']:focus + .slider:after,
 .switch:hover {
@@ -252,9 +265,9 @@ select:focus,
 
 <!-- <div class="closepane"></div> -->
 <div class="settings" class:active="{$settings.show}">
-  <!-- <div class="title">
+  <div class="title">
     <h1 data-lang="{userLang}" data-fr="Parametre"><span> Settings</span></h1>
-  </div> -->
+  </div>
   <!-- <div class="close">X</div> -->
   <div class="general">
     <!-- <h2 data-lang="{userLang}" data-fr="Genéral"><span> General</span></h2> -->
@@ -272,32 +285,41 @@ select:focus,
       </h3>
       <label class="switch"><input
           type="checkbox"
-          bind:checked="{$settings.direction}" />
+          bind:checked="{$settings.nestDirectionBottom}" />
         <div class="slider direction" data-lang="{userLang}"></div></label>
+    </div>
+    <div class="input-wrapper">
+      <h3 data-lang="{userLang}" data-fr="Nest avec: ">
+        <span>Nest with: </span>
+      </h3>
+      <label class="switch"><input
+          type="checkbox"
+          bind:checked="{$settings.nestTypeColumn}" />
+        <div class="slider type" data-lang="{userLang}"></div></label>
     </div>
     <div class="input-wrapper">
       <h3 data-lang="{userLang}" data-fr="Nest par le: ">
         <span>Nest by: </span>
       </h3>
-      <select bind:value="{$settings.placementType}">
+      <select bind:value="{$settings.nestOrder}">
         <option data-lang="{userLang}" data-fr="plus large" value="widest">
           <span>widest</span>
         </option>
-        <option data-lang="{userLang}" data-fr="moins large" value="narrowest">
+        <!-- <option data-lang="{userLang}" data-fr="moins large" value="narrowest">
           <span>narrowest</span>
-        </option>
+        </option> -->
         <option data-lang="{userLang}" data-fr="plus haut" value="tallest">
           <span>tallest</span>
         </option>
-        <option data-lang="{userLang}" data-fr="moins haut" value="shortest">
+        <!-- <option data-lang="{userLang}" data-fr="moins haut" value="shortest">
           <span>shortest</span>
-        </option>
+        </option> -->
         <option data-lang="{userLang}" data-fr="plus grand" value="biggest">
           <span>biggest</span>
         </option>
-        <option data-lang="{userLang}" data-fr="moins grand" value="smallest">
+        <!-- <option data-lang="{userLang}" data-fr="moins grand" value="smallest">
           <span>smallest</span>
-        </option>
+        </option> -->
       </select>
     </div>
     <div class="input-wrapper">

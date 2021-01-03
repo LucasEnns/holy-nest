@@ -1,5 +1,10 @@
 // stores.js
 // import { writable } from 'svelte/store'
+
+// tool library
+// missing pass max CUT_TO_DEPTH
+// missing angle
+
 import { localStore } from './localStore.js'
 import { sessionStore } from './sessionStore.js'
 import { formatDate } from './methods.js'
@@ -14,10 +19,10 @@ let placementSettings = {
     margins: 0.3,
   },
   tool: 9,
-  // gap: 0,
-  placementType: 'widest',
+  nestTypeColumn: false,
+  nestOrder: 'widest',
+  nestDirectionBottom: true,
   units: false,
-  direction: true,
   show: true,
   cnc: {
     1: {
@@ -31,12 +36,12 @@ let placementSettings = {
     },
     2: {
       type: 'Endmill',
-      diameter: 0.25,
+      diameter: 0.75,
       spindle: 18000,
       feed: 150,
       plunge: 40,
-      ramp: 1,
-      max_depth: 0.125,
+      ramp: 3,
+      max_depth: 3,
     },
     3: {
       type: 'Ballnose',
@@ -48,22 +53,22 @@ let placementSettings = {
       max_depth: 0.125,
     },
     4: {
-      type: 'Endmill',
-      diameter: 0.125,
+      type: 'Edger',
+      diameter: 0.75,
       spindle: 18000,
-      feed: 150,
+      feed: 100,
       plunge: 40,
-      ramp: 1,
-      max_depth: 0.125,
+      ramp: 2.25,
+      max_depth: 2.25,
     },
     5: {
-      type: 'Endmill',
-      diameter: 0.125,
+      type: 'drill',
+      diameter: 0.19685,
       spindle: 18000,
-      feed: 150,
-      plunge: 40,
-      ramp: 1,
-      max_depth: 0.125,
+      feed: 0,
+      plunge: 70,
+      ramp: 0,
+      max_depth: 1,
     },
     6: {
       type: 'Endmill',
@@ -76,11 +81,20 @@ let placementSettings = {
     },
     7: {
       type: 'drill',
-      diameter: 0.125,
+      diameter: 0.31496,
       spindle: 18000,
       feed: 0,
       plunge: 70,
       ramp: 0,
+      max_depth: 1,
+    },
+    8: {
+      type: 'surfacing',
+      diameter: 2.5,
+      spindle: 10000,
+      feed: 75,
+      plunge: 30,
+      ramp: 8,
       max_depth: 0.125,
     },
     9: {
@@ -91,6 +105,33 @@ let placementSettings = {
       plunge: 70,
       ramp: 1,
       max_depth: 0.875,
+    },
+    10: {
+      type: 'Endmill',
+      diameter: 0.375,
+      spindle: 18000,
+      feed: 400,
+      plunge: 70,
+      ramp: 1,
+      max_depth: 0.875,
+    },
+    11: {
+      type: 'drill',
+      diameter: 0.3937,
+      spindle: 18000,
+      feed: 0,
+      plunge: 70,
+      ramp: 0,
+      max_depth: 1,
+    },
+    12: {
+      type: 'Vcarve',
+      diameter: 1.5,
+      spindle: 18000,
+      feed: 75,
+      plunge: 40,
+      ramp: 1,
+      max_depth: 0.75,
     },
   },
 }
