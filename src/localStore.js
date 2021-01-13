@@ -1,33 +1,31 @@
 import { writable } from 'svelte/store'
-// import YAML from 'yaml';
 
 export const localStore = (key, initial) => {
-  // receives the key of the local storage and an initial value
-
-  // helper function
-  const toString = (value) => JSON.stringify(value, null, 2)
-  // helper function
-  const toObj = JSON.parse
-
-  // item not present in local storage
-  if (localStorage.getItem(key) === null) {
-    // initialize local storage with initial value
-    localStorage.setItem(key, toString(initial))
+  const str = (obj) => JSON.stringify(obj, null, 2)
+  // set with initial value if item not present
+  if (!localStorage.getItem(key)) {
+    localStorage.setItem(key, str(initial))
   }
 
-  // convert to object
-  const saved = toObj(localStorage.getItem(key))
-
-  // create the underlying writable store
-  const { subscribe, set, update } = writable(saved)
+  const localKey = JSON.parse(localStorage.getItem(key))
+  // reset with initial value as string if settings updated
+  if (!sameKeys(localKey, initial)) {
+    localStorage.setItem(key, str(initial))
+  }
+  // create the writable store
+  const { subscribe, set, update } = writable(localKey)
 
   return {
     subscribe,
     set: (value) => {
       // save also to local storage as a string
-      localStorage.setItem(key, toString(value))
+      localStorage.setItem(key, str(value))
       return set(value)
     },
     update,
   }
+}
+
+function sameKeys(obj1, obj2) {
+  return Object.keys(obj1).join() === Object.keys(obj2).join()
 }

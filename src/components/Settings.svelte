@@ -1,6 +1,5 @@
 <script>
 import { settings } from '../stores.js'
-let userLang = navigator.language || navigator.userLanguage
 
 function highlight() {
   this.select()
@@ -53,15 +52,16 @@ function highlight() {
 /* .close {
   text-align: end;
 } */
-/* h1 {
+h2 {
+  /* font-size: 1em; */
   min-width: 100%;
   padding-top: 2vh;
   padding-right: 100%;
   text-transform: uppercase;
   font-weight: 100;
-  letter-spacing: 2rem;
+  letter-spacing: 1.5rem;
 }
-h2 {
+/* h2 {
   padding-top: 1vh;
   text-transform: uppercase;
   font-size: var(--xlarge);
@@ -265,68 +265,74 @@ select:focus,
 
 <!-- <div class="closepane"></div> -->
 <div class="settings" class:active="{$settings.show}">
+  <div class="close">X</div>
   <div class="title">
-    <h1 data-lang="{userLang}" data-fr="Parametre"><span> Settings</span></h1>
+    <h2 data-lang="{$settings.language}" data-fr="Parametre">
+      <span> Settings</span>
+    </h2>
   </div>
-  <!-- <div class="close">X</div> -->
   <div class="general">
-    <!-- <h2 data-lang="{userLang}" data-fr="Genéral"><span> General</span></h2> -->
+    <!-- <h2 data-lang="{$settings.language}" data-fr="Genéral"><span> General</span></h2> -->
 
     <div class="input-wrapper">
-      <h3 data-lang="{userLang}" data-fr="Unités: "><span>Units: </span></h3>
-      <label class="switch"><input
-          type="checkbox"
-          bind:checked="{$settings.units}" />
-        <div class="slider units" data-lang="{userLang}"></div></label>
-    </div>
-    <div class="input-wrapper">
-      <h3 data-lang="{userLang}" data-fr="Nest apartir de: ">
+      <h3 data-lang="{$settings.language}" data-fr="Nest apartir de: ">
         <span>Nest from: </span>
       </h3>
       <label class="switch"><input
           type="checkbox"
           bind:checked="{$settings.nestDirectionBottom}" />
-        <div class="slider direction" data-lang="{userLang}"></div></label>
+        <div
+          class="slider direction"
+          data-lang="{$settings.language}"></div></label>
     </div>
     <div class="input-wrapper">
-      <h3 data-lang="{userLang}" data-fr="Nest avec: ">
+      <h3 data-lang="{$settings.language}" data-fr="Nest avec: ">
         <span>Nest with: </span>
       </h3>
       <label class="switch"><input
           type="checkbox"
           bind:checked="{$settings.nestTypeColumn}" />
-        <div class="slider type" data-lang="{userLang}"></div></label>
+        <div class="slider type" data-lang="{$settings.language}"></div></label>
     </div>
     <div class="input-wrapper">
-      <h3 data-lang="{userLang}" data-fr="Nest par le: ">
+      <h3 data-lang="{$settings.language}" data-fr="Nest par le: ">
         <span>Nest by: </span>
       </h3>
       <select bind:value="{$settings.nestOrder}">
-        <option data-lang="{userLang}" data-fr="plus large" value="widest">
+        <option
+          data-lang="{$settings.language}"
+          data-fr="plus large"
+          value="widest">
           <span>widest</span>
         </option>
-        <!-- <option data-lang="{userLang}" data-fr="moins large" value="narrowest">
+        <!-- <option data-lang="{$settings.language}" data-fr="moins large" value="narrowest">
           <span>narrowest</span>
         </option> -->
-        <option data-lang="{userLang}" data-fr="plus haut" value="tallest">
+        <option
+          data-lang="{$settings.language}"
+          data-fr="plus haut"
+          value="tallest">
           <span>tallest</span>
         </option>
-        <!-- <option data-lang="{userLang}" data-fr="moins haut" value="shortest">
+        <!-- <option data-lang="{$settings.language}" data-fr="moins haut" value="shortest">
           <span>shortest</span>
         </option> -->
-        <option data-lang="{userLang}" data-fr="plus grand" value="biggest">
+        <option
+          data-lang="{$settings.language}"
+          data-fr="plus grand"
+          value="biggest">
           <span>biggest</span>
         </option>
-        <!-- <option data-lang="{userLang}" data-fr="moins grand" value="smallest">
+        <!-- <option data-lang="{$settings.language}" data-fr="moins grand" value="smallest">
           <span>smallest</span>
         </option> -->
       </select>
     </div>
     <div class="input-wrapper">
-      <h3 data-lang="{userLang}" data-fr="Info sur les feuilles: ">
+      <h3 data-lang="{$settings.language}" data-fr="Info sur les feuilles: ">
         <span>Sheet info: </span>
       </h3>
-      <h5 data-lang="{userLang}" data-fr="Largeur: ">
+      <h5 data-lang="{$settings.language}" data-fr="Largeur: ">
         <span>Width: </span>
         <input
           class="input"
@@ -334,7 +340,7 @@ select:focus,
           bind:value="{$settings.material.width}"
           step="0.0625" />
       </h5>
-      <h5 data-lang="{userLang}" data-fr="Hauteur: ">
+      <h5 data-lang="{$settings.language}" data-fr="Hauteur: ">
         <span>Height: </span>
         <input
           class="input"
@@ -342,7 +348,7 @@ select:focus,
           bind:value="{$settings.material.height}"
           step="0.0625" />
       </h5>
-      <h5 data-lang="{userLang}" data-fr="Épaisseur: ">
+      <h5 data-lang="{$settings.language}" data-fr="Épaisseur: ">
         <span>Thickness: </span>
         <input
           class="input"
@@ -352,7 +358,17 @@ select:focus,
       </h5>
     </div>
     <div class="input-wrapper">
-      <h5 data-lang="{userLang}" data-fr="Marge: ">
+      <h5 data-lang="{$settings.language}" data-fr="Profondeur coupe:: ">
+        <span>Cut depth: </span>
+        <input
+          class="input"
+          type="number"
+          bind:value="{$settings.material.cut_depth}"
+          step="0.05" />
+      </h5>
+    </div>
+    <div class="input-wrapper">
+      <h5 data-lang="{$settings.language}" data-fr="Marge: ">
         <span>Margins: </span>
         <input
           class="input"
@@ -364,12 +380,12 @@ select:focus,
   </div>
 
   <div class="cnc">
-    <!-- <h2 data-lang="{userLang}" data-fr="CNC"><span> CNC</span></h2> -->
+    <!-- <h2 data-lang="{$settings.language}" data-fr="CNC"><span> CNC</span></h2> -->
     <div class="input-wrapper">
-      <h3 data-lang="{userLang}" data-fr="Outil pour la decoupe: ">
+      <h3 data-lang="{$settings.language}" data-fr="Outil pour la decoupe: ">
         <span>Profile cutting tool: </span>
       </h3>
-      <h5 data-lang="{userLang}" data-fr="Outil #: ">
+      <h5 data-lang="{$settings.language}" data-fr="Outil #: ">
         <span>Tool #: </span>
         <input
           class="input"
@@ -379,16 +395,16 @@ select:focus,
       </h5>
     </div>
     <div class="input-wrapper">
-      <h5 data-lang="{userLang}" data-fr="Type: ">
-        <span>Type: </span>
+      <h5 data-lang="{$settings.language}" data-fr="Nom: ">
+        <span>Name: </span>
         <input
           class="input"
           type="text"
-          bind:value="{$settings.cnc[$settings.tool].type}" />
+          bind:value="{$settings.cnc[$settings.tool].name}" />
       </h5>
     </div>
     <div class="input-wrapper">
-      <h5 data-lang="{userLang}" data-fr="Diametre: ">
+      <h5 data-lang="{$settings.language}" data-fr="Diametre: ">
         <span>Diameter: </span>
         <input
           class="input"
@@ -398,7 +414,7 @@ select:focus,
       </h5>
     </div>
     <div class="input-wrapper">
-      <h5 data-lang="{userLang}" data-fr="Diametre: ">
+      <h5 data-lang="{$settings.language}" data-fr="Diametre: ">
         <span>Spindle speed: </span>
         <input
           class="input"
@@ -409,7 +425,7 @@ select:focus,
       </h5>
     </div>
     <div class="input-wrapper">
-      <h5 data-lang="{userLang}" data-fr="vitesse de coupe: ">
+      <h5 data-lang="{$settings.language}" data-fr="vitesse de coupe: ">
         <span>Feed rate: </span>
         <input
           class="input"
@@ -420,7 +436,7 @@ select:focus,
       </h5>
     </div>
     <div class="input-wrapper">
-      <h5 data-lang="{userLang}" data-fr="vitesse de plonge: ">
+      <h5 data-lang="{$settings.language}" data-fr="vitesse de plonge: ">
         <span>Plunge rate: </span>
         <input
           class="input"
@@ -431,7 +447,7 @@ select:focus,
       </h5>
     </div>
     <div class="input-wrapper">
-      <h5 data-lang="{userLang}" data-fr="Longeur de plonge: ">
+      <h5 data-lang="{$settings.language}" data-fr="Longeur de plonge: ">
         <span>Plunge ramp: </span>
         <input
           class="input"
@@ -442,7 +458,7 @@ select:focus,
       </h5>
     </div>
     <div class="input-wrapper">
-      <h5 data-lang="{userLang}" data-fr="Max profondeur/passe: ">
+      <h5 data-lang="{$settings.language}" data-fr="Max profondeur/passe: ">
         <span>Max depth/pass: </span>
         <input
           class="input"

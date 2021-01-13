@@ -1,87 +1,66 @@
 /////////////////TO DO//////////////////////////////////
+// refactoring ugly code
 
-/////////////////IDEAS//////////////////////////////////
-// simple gui to accept or reject nested sheets
-// potentially flag sheets with low score
-// click sheet shuffle columns
+let NEST_ORDER = 'widest'
 
-// new technique-- class panel widths by +- %
-// if none next is +- 1/2 of width
+export function Nest(panelCSV, settings) {
+  NEST_ORDER = settings.nestOrder
+  let ERRORS = [],
+    IS_FROM_BOTTOM = settings.nestDirectionBottom,
+    IS_BY_COLUMNS = settings.nestTypeColumn,
+    CUTTER = settings.cnc[settings.tool].diameter || 0.375,
+    MATERIAL = {
+      width: settings.material.width || 49,
+      height: settings.material.height || 97,
+      margins: settings.material.margins || 0.25,
+      max_width: () => MATERIAL.width - MATERIAL.margins * 2 - CUTTER,
+      max_height: () => MATERIAL.height - MATERIAL.margins * 2 - CUTTER,
+    },
+    PANELS = panelObjectMap(panelCSV), // raw csv panel input converted
+    SHEETS = makeSheets(PANELS)
 
-// idea 2
-// start width columns of all the similar widths
-// that join columns
+  return { sheets: SHEETS, errors: ERRORS }
 
-// import { toDECIMAL } from "./methods"
+  ////// helper functions below ///////////////
 
-let NEST_ORDER = 'widest',
-  IS_FROM_BOTTOM = true,
-  IS_BY_COLUMNS = true,
-  CUTTER = 0.375, // end mill diameter used to space panels
-  ERRORS = [], // catch all panels that don't fit
-  MATERIAL = {
-    // sheet size and options
-    width: 49,
-    height: 97,
-    margins: 0.25,
-    max_width: () => MATERIAL.width - MATERIAL.margins * 2 - CUTTER,
-    max_height: () => MATERIAL.height - MATERIAL.margins * 2 - CUTTER,
-  }
-
-export function Nest(
-  panels,
-  firstPanelRow = 1,
-  nestType = IS_BY_COLUMNS,
-  nestOrder = NEST_ORDER,
-  nestDirection = IS_FROM_BOTTOM,
-  cutter = CUTTER,
-  material = MATERIAL
-) {
-  function panelArrayCreator() {
-    // console.log(CSVToArray( panels ));
+  function panelObjectMap(csv) {
     return new List(
-      panels.slice(firstPanelRow).flatMap((i) => {
-        return quantityIDs(i).map((i) => new Panel(i))
-      })
+      csv.flatMap((i) => panelTranslator(i).map((i) => new Panel(i)))
     ).flat()
-  }
 
-  function quantityIDs([id, quantity, width, height]) {
-    if (width > MATERIAL.max_width() || height > MATERIAL.max_height()) {
-      ERRORS.push(`Panneau ${id} est trop gros`)
-      // ERRORS.push(`Panel ${id} is too big`)
-      return []
-    } else if (!width || !height || !quantity) return []
-    let n = 1,
-      uniqueIDs = []
-    while (quantity >= n) {
-      let q = ''
-      if (quantity > 1) q = `${n} sur ${quantity}`
-      // if ( quantity > 1 ) q = `${n} of ${quantity}`
-      uniqueIDs.push([q, id, parseFloat(width), parseFloat(height)])
-      n++
+    function panelTranslator([id, quantity, width, height]) {
+      return removeErrors()
+
+      function removeErrors() {
+        if (width > MATERIAL.max_width() || height > MATERIAL.max_height()) {
+          ERRORS.push(`Panneau ${id} est trop gros`)
+          // ERRORS.push(`Panel ${id} is too big`)
+          return []
+        } else if (!width || !height || !quantity) return []
+        return separatePanels()
+      }
+      function separatePanels(n = 0, panelOutput = []) {
+        width += CUTTER
+        height += CUTTER
+        while (quantity > n++) {
+          let qID = ''
+          if (quantity > 1) qID = `${n} sur ${quantity}`
+          // if ( quantity > 1 ) q = `${n} of ${quantity}`
+          panelOutput.push([qID, id, width, height, NEST_ORDER])
+          // n++
+        }
+        return panelOutput
+      }
     }
-    return uniqueIDs
   }
-
-  ERRORS = []
-  const PANELS = panelArrayCreator() // raw csv panel input converted
-  // const METRIC_UNITS = metricUnits  // default false
-  NEST_ORDER = nestOrder
-  IS_FROM_BOTTOM = nestDirection
-  IS_BY_COLUMNS = nestType
-  CUTTER = cutter
-  MATERIAL.width = material.width
-  MATERIAL.height = material.height
-  MATERIAL.margins = material.margins
 
   function fillRow(panels) {
     let row = new List(panels.placementBy().place())
     let maxHeight = row[0].height
     // add columns of panels to row until
     // no space remains or no more panels
-    while (panels.fitsRow(row)) {
-      let column = new List(panels.fitsRow(row).place())
+    while (panels.fitsRow(row, MATERIAL.max_width())) {
+      let column = new List(panels.fitsRow(row, MATERIAL.max_width()).place())
       // add more panels to column if space remains
       while (panels.fitsColumn(column, maxHeight)) {
         column.push(panels.fitsColumn(column, maxHeight).place())
@@ -102,7 +81,8 @@ export function Nest(
           row.rowWidth(), //width
           row.rowHeight(), // height
           row.totalArea(), // area
-          row // group
+          row,
+          NEST_ORDER // group
         )
       )
     }
@@ -114,8 +94,10 @@ export function Nest(
     let maxWidth = column[0].width
     // add rows of panels to column until
     // no space remains or no more panels
-    while (panels.fitsColumn(column)) {
-      let row = new List(panels.fitsColumn(column).place())
+    while (panels.fitsColumn(column, MATERIAL.max_height())) {
+      let row = new List(
+        panels.fitsColumn(column, MATERIAL.max_height()).place()
+      )
       // add more panels to row if space remains
       while (panels.fitsRow(row, maxWidth)) {
         row.push(panels.fitsRow(row, maxWidth).place())
@@ -139,7 +121,8 @@ export function Nest(
           column.columnWidth(), //width
           column.columnHeight(), // height
           column.totalArea(), // area
-          column // group
+          column,
+          NEST_ORDER // group
         )
       )
     }
@@ -148,16 +131,16 @@ export function Nest(
 
   function fillSheetColumns(columns) {
     let sheet = new List(columns.placementBy().place())
-    while (columns.fitsSheetColumn(sheet)) {
-      sheet.push(columns.fitsSheetColumn(sheet).place())
+    while (columns.fitsSheetColumn(sheet, MATERIAL.max_width())) {
+      sheet.push(columns.fitsSheetColumn(sheet, MATERIAL.max_width()).place())
     }
     return sheet.ascendingHeight()
   }
 
   function fillSheetRows(rows) {
     let sheet = new List(rows.placementBy().place())
-    while (rows.fitsSheetRow(sheet)) {
-      sheet.push(rows.fitsSheetRow(sheet).place())
+    while (rows.fitsSheetRow(sheet, MATERIAL.max_height())) {
+      sheet.push(rows.fitsSheetRow(sheet, MATERIAL.max_height()).place())
     }
     return sheet.ascendingWidth()
   }
@@ -176,7 +159,8 @@ export function Nest(
             sheet.totalArea(), // area
             sheet.map((list) => list.group).flatten(2), // group
             sheet, // columns
-            sheets.length + 1 // id
+            sheets.length + 1, // id
+            MATERIAL
           )
         )
       }
@@ -192,7 +176,8 @@ export function Nest(
             sheet.totalArea(), // area
             sheet.map((list) => list.group).flatten(2), // group
             sheet, // columns
-            sheets.length + 1 // id
+            sheets.length + 1, // id
+            MATERIAL
           )
         )
       }
@@ -313,17 +298,15 @@ export function Nest(
     })
   }
 
-  let sheets = makeSheets(PANELS)
-  return [PANELS, sheets, ERRORS]
-}
-
-function firstIndex(index) {
-  return index === 0
+  function firstIndex(index) {
+    return index === 0
+  }
 }
 
 class Placement {
-  constructor() {
+  constructor(nestOrder) {
     this.placed = false
+    this.nestOrder = nestOrder
   }
   place() {
     this.placed = true
@@ -331,12 +314,13 @@ class Placement {
   }
 }
 class Panel extends Placement {
-  constructor([uniqueID, id, width, height]) {
-    super()
-    this.uniqueID = uniqueID
+  constructor([quantityID, id, width, height, nestOrder]) {
+    super(nestOrder)
+    this.nestOrder = nestOrder
+    this.quantityID = quantityID
     this.id = id
-    this.width = width + CUTTER
-    this.height = height + CUTTER
+    this.width = width
+    this.height = height
     this.area = this.height * this.width
     this.x = 0
     this.y = 0
@@ -350,8 +334,8 @@ class Panel extends Placement {
   }
 }
 class Column extends Placement {
-  constructor(width, height, area, group) {
-    super()
+  constructor(width, height, area, group, nestOrder) {
+    super(nestOrder)
     this.width = width
     this.height = height
     this.area = area
@@ -359,17 +343,17 @@ class Column extends Placement {
   }
 }
 class Row extends Column {
-  constructor(width, height, area, group) {
-    super(width, height, area, group)
+  constructor(width, height, area, group, nestOrder) {
+    super(width, height, area, group, nestOrder)
   }
 }
 class Sheet extends Column {
-  constructor(width, height, area, group, columns, id) {
+  constructor(width, height, area, group, columns, id, sheet) {
     super(width, height, area, group)
     this.columns = columns
-    this.sheet_width = MATERIAL.width
-    this.sheet_height = MATERIAL.height
-    this.sheet_area = MATERIAL.width * MATERIAL.height
+    this.sheet_width = sheet.width
+    this.sheet_height = sheet.height
+    this.sheet_area = sheet.width * sheet.height
     this.waste_area = this.sheet_area - this.area
     this.waste_ratio = 1 - this.area / this.sheet_area
     this.id = 'Feuille ' + id
@@ -390,20 +374,8 @@ class List extends Array {
     let flattened = this
     while (dimensions--) {
       flattened = flattened.flat()
-      // dimensions--
     }
     return flattened
-  }
-  // removeIndex( index ) {
-  //     let list = [...this]
-  //     this = [...list.slice(0, index), ...list.slice(index + 1)]
-  // }
-  // removeValue( value ) {
-  //     this.removeIndex( array.indexOf( value ) )
-  // }
-  shuffle() {
-    if (this.length < 3) return this
-    return new List(...this.slice(1), this.first())
   }
   // sorting methods
   ascendingWidth() {
@@ -442,24 +414,12 @@ class List extends Array {
       .notPlaced()
       .first()
   }
-  // placementBy = { "widest": widest(), "tallest": tallest() }
   placementBy() {
-    switch (NEST_ORDER) {
-      case 'widest':
-        return this.widest()
-      case 'narrowest':
-        return this.narrowest()
-      case 'tallest':
-        return this.tallest()
-      case 'shortest':
-        return this.shortest()
-      case 'biggest':
-        return this.biggest()
-      case 'smallest':
-        return this.smallest()
-      default:
-        break
-    }
+    return {
+      widest: this.widest(),
+      tallest: this.tallest(),
+      biggest: this.biggest(),
+    }[this.length ? this[0].nestOrder : '']
   }
   // group measurement methods
   totalWidth() {
@@ -510,12 +470,12 @@ class List extends Array {
       (panel) => panel.height <= group[0].height
     ).fitsSheetColumn(group, maxWidth)
   }
-  fitsSheetColumn(group, maxWidth = MATERIAL.max_width()) {
+  fitsSheetColumn(group, maxWidth) {
     return this.notPlaced()
       .filter((panel) => panel.width < group.remainingWidth(maxWidth))
       .placementBy()
   }
-  fitsSheetRow(group, maxHeight = MATERIAL.max_height()) {
+  fitsSheetRow(group, maxHeight) {
     return this.notPlaced()
       .filter((panel) => panel.height < group.remainingHeight(maxHeight))
       .placementBy()

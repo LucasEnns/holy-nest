@@ -1,26 +1,28 @@
 <script>
-import { panels, sheets, settings, svg, activePanel } from '../stores.js'
-// import { afterUpdate } from 'svelte'
+// to do :
+//units to mm scale setting
+
+import { settings, data } from '../stores.js'
+import { afterUpdate } from 'svelte'
 import { trunc } from '../methods.js'
 
 let id,
   displayInfo = false,
   top = 0,
   left = 0,
-  scale = 90, // inches to pixels
+  scale = 90,
+  // scale = $settings.units ? 90 * 25.4 : 90,
   svgFile
 
-// afterUpdate(() => {
-//   if ($sheets.length) {
-//     $svg = svgFile.innerHTML.toString()
-//   }
-// })
+afterUpdate(() => {
+  $data.svg = svgFile.innerHTML.toString()
+})
 
 function panelHoverOn() {
-  $activePanel = this.id
+  $settings.activePanel = this.id
 }
 function panelHoverOff() {
-  $activePanel = ''
+  $settings.activePanel = ''
 }
 
 function showInfo() {
@@ -41,8 +43,8 @@ function flipY(y, height) {
 
 function shift(index) {
   let maxColumns = 5,
-    rows = Math.ceil($sheets.length / maxColumns),
-    columns = Math.ceil($sheets.length / rows),
+    rows = Math.ceil($data.sheets.length / maxColumns),
+    columns = Math.ceil($data.sheets.length / rows),
     row = Math.ceil((index + 1) / columns) - 1,
     column = index % columns,
     x = column * $settings.material.width,
@@ -122,17 +124,21 @@ svg {
 
 {#if displayInfo}
   <div class="infocard" style="left: {left}px; top: {top}px;">
-    <h4>{$sheets[id].id}</h4>
-    <p>area des panneaux: {trunc($sheets[id].area / 144, 2)} pi<sup>2</sup></p>
+    <h4>{$data.sheets[id].id}</h4>
     <p>
-      area de perte:
-      {trunc($sheets[id].waste_area / 144, 2)}
+      area des panneaux:
+      {trunc($data.sheets[id].area / 144, 2)}
       pi<sup>2</sup>
     </p>
-    <p>% de perte: {trunc($sheets[id].waste_ratio * 100, 2)}%</p>
-    <!-- <p>used area: {trunc( $sheets[id].area / 144, 2)} pi<sup>2</sup></p>
-    <p>waste area: {trunc($sheets[id].waste_area / 144, 2)} pi<sup>2</sup></p>
-    <p>waste: {trunc($sheets[id].waste_ratio * 100, 2)}%</p> -->
+    <p>
+      area de perte:
+      {trunc($data.sheets[id].waste_area / 144, 2)}
+      pi<sup>2</sup>
+    </p>
+    <p>% de perte: {trunc($data.sheets[id].waste_ratio * 100, 2)}%</p>
+    <!-- <p>used area: {trunc( $data.sheets[id].area / 144, 2)} pi<sup>2</sup></p>
+    <p>waste area: {trunc($data.sheets[id].waste_area / 144, 2)} pi<sup>2</sup></p>
+    <p>waste: {trunc($data.sheets[id].waste_ratio * 100, 2)}%</p> -->
   </div>
 {/if}
 
@@ -142,11 +148,11 @@ svg {
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink"
-    width="{shift($sheets.length - 1).w * scale || 0}"
-    height="{shift($sheets.length - 1).h * scale || 0}"
-    viewBox="0 0 {shift($sheets.length - 1).w * scale || 0} {shift($sheets.length - 1).h * scale || 0}"
+    width="{shift($data.sheets.length - 1).w * scale || 0}"
+    height="{shift($data.sheets.length - 1).h * scale || 0}"
+    viewBox="0 0 {shift($data.sheets.length - 1).w * scale || 0} {shift($data.sheets.length - 1).h * scale || 0}"
     preserveAspectRatio="xMidYMid meet">
-    {#each $sheets as sheet, index}
+    {#each $data.sheets as sheet, index}
       <g id="sheets">
         <rect
           style="stroke-width: {$settings.material.margins * scale}px;"
@@ -165,7 +171,7 @@ svg {
             style="stroke-width: {$settings.cnc[$settings.tool].diameter * scale}px;"
             on:mouseover="{panelHoverOn}"
             on:mouseleave="{panelHoverOff}"
-            class="panel {$activePanel == panel.id ? 'active' : ''} print"
+            class="panel {$settings.activePanel == panel.id ? 'active' : ''} print"
             id="{panel.id}"
             x="{(panel.x + shift(index).x) * scale}"
             y="{(flipY(panel.y, panel.height) + shift(index).y) * scale}"
@@ -173,8 +179,8 @@ svg {
             height="{panel.height * scale}"></rect>
 
           <text
-            style="font-size: {Math.min(panel.height * 0.8, 5) * scale}px;"
-            class="id {$activePanel == panel.id ? 'active' : ''} print"
+            style="font-size: {scale * (panel.id.length > 6 ? Math.min(panel.height * 0.4, 2.5) : Math.min(panel.height * 0.8, 5))}px;"
+            class="id {$settings.activePanel == panel.id ? 'active' : ''} print"
             x="{(panel.x + shift(index).x + panel.width / 2) * scale}"
             y="{(flipY(panel.y, panel.height) + shift(index).y + Math.min(panel.height * 0.8, 5) / 3 + panel.height / 2) * scale}">
             {panel.id}
