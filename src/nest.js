@@ -1,5 +1,5 @@
 /////////////////TO DO//////////////////////////////////
-// refactoring ugly code
+// refactor ugly code
 
 let NEST_ORDER = 'widest'
 
@@ -95,9 +95,7 @@ export function Nest(panelCSV, settings) {
     // add rows of panels to column until
     // no space remains or no more panels
     while (panels.fitsColumn(column, MATERIAL.max_height())) {
-      let row = new List(
-        panels.fitsColumn(column, MATERIAL.max_height()).place()
-      )
+      let row = new List(panels.fitsColumn(column, MATERIAL.max_height()).place())
       // add more panels to row if space remains
       while (panels.fitsRow(row, maxWidth)) {
         row.push(panels.fitsRow(row, maxWidth).place())
@@ -192,25 +190,19 @@ export function Nest(panelCSV, settings) {
     rows.forEach((row, i) => {
       // xPos map of columns, first index === start
       if (i === 0) {
-        yPos.push(
-          IS_FROM_BOTTOM ? margin : MATERIAL.height - margin - row.height
-        )
+        yPos.push(IS_FROM_BOTTOM ? margin : MATERIAL.height - margin - row.height)
       }
       // everything after calculated += prev. width
       else {
         yPos.push(
-          IS_FROM_BOTTOM
-            ? yPos.last() + rows[i - 1].height
-            : yPos.last() - row.height
+          IS_FROM_BOTTOM ? yPos.last() + rows[i - 1].height : yPos.last() - row.height
         )
       }
       // iterate each row in column
       let xPos = new List()
       row.group.forEach((column, j, columns) => {
         // yPos map of rows, first index === start
-        xPos.push(
-          firstIndex(j) ? margin : xPos.last() + columns[j - 1].columnWidth()
-        )
+        xPos.push(firstIndex(j) ? margin : xPos.last() + columns[j - 1].columnWidth())
         // add x and y prop to each row in column
         // not good clean code -- needs refactoring
         let isFirstRow = firstIndex(i) && rows.length > 1
@@ -466,9 +458,10 @@ class List extends Array {
     )
   }
   fitsRow(group, maxWidth) {
-    return this.filter(
-      (panel) => panel.height <= group[0].height
-    ).fitsSheetColumn(group, maxWidth)
+    return this.filter((panel) => panel.height <= group[0].height).fitsSheetColumn(
+      group,
+      maxWidth
+    )
   }
   fitsSheetColumn(group, maxWidth) {
     return this.notPlaced()

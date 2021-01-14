@@ -1,5 +1,4 @@
 export function toFloat(str) {
-  // const cleanFloat = (str) => cleanFloat(parseFloat(str))
   if (!isNaN(str)) return cleanFloat(str) // if number return float
   if (str.includes('/') && !str.includes('.')) {
     return str

@@ -6,14 +6,14 @@ import { createEventDispatcher } from 'svelte'
 
 const dispatch = createEventDispatcher()
 
-const today = formatDate(new Date(), '.yy.mm.dd.HHhMM')
+const time = () => formatDate(new Date(), '-HHhMM')
 
 let badFile = false,
   keys = {},
   dlCSV,
   dlSVG,
   dlCNC,
-  project,
+  project = [],
   open
 
 function updatePanels() {
@@ -29,7 +29,7 @@ function handleKeyDown(e) {
   if (key('KeyV')) dlCSV.click()
   if (key('KeyG')) dlSVG.click()
   if (key('KeyC')) dlCNC.click()
-  if (key('KeyS')) $settings.show = !$settings.show
+  if (key('KeyP')) $settings.show = !$settings.show
 }
 
 function handleKeyUp(e) {
@@ -37,9 +37,9 @@ function handleKeyUp(e) {
 }
 
 function newFile() {
-  $data.csv.contents = [...$data.csv.new[$settings.language]]
+  $data.csv.contents = [...$data.csv.new]
   updatePanels()
-  project.firstChild().focus()
+  project[0].focus()
 }
 
 function loadFile() {
@@ -60,7 +60,6 @@ function loadFile() {
 
 <style>
 .file-mgmt {
-  /* padding-top: 1rem; */
   display: flex;
   vertical-align: center;
   align-items: center;
@@ -82,7 +81,6 @@ function loadFile() {
 .file-icon:focus,
 .setting-icon.active,
 input:focus + .file-icon {
-  /* position: relative; */
   height: 2.5em;
   width: 2.3em;
   transition: 0.1s;
@@ -117,10 +115,7 @@ input:focus + .file-icon {
   pointer-events: none;
 }
 .file-icon:before {
-  /* transform: rotate(45deg); */
   transform: skewX(30deg);
-  /* left: 4.4rem; */
-  /* bottom: 0rem; */
   border-radius: 0;
   width: 0.5rem;
   height: 0.5rem;
@@ -195,20 +190,20 @@ input:focus + .file-icon {
   background-image: url('../img/settings-hover.png');
 }
 h6 {
+  white-space: nowrap;
   display: flex;
 }
 h6 > input {
-  flex: 2;
+  width: 2%;
+  flex: 2 !important;
 
-  font-size: 1.4em;
-  /* width: 55%; */
-  /* padding: 10; */
+  font-size: 1.3em;
   text-align: left;
 }
 </style>
 
 <svelte:head>
-  <title>{'Holy! Nest: ' + $data.csv.contents[0][1] || 'Holy! Nest'}</title>
+  <title>{'Ahhh Nest: ' + $data.csv.contents[0][1] || 'Ahhh! Nest'}</title>
 </svelte:head>
 <svelte:window on:keydown="{handleKeyDown}" on:keyup="{handleKeyUp}" />
 
@@ -240,7 +235,7 @@ h6 > input {
   {#if $data.sheets.length}
     <a
       href="data:text/plain;charset=utf-8,{encodeURIComponent($data.csv.output)}"
-      download="{$data.name + today}.csv"
+      download="{$data.name + time()}.csv"
       role="button"
       data-lang="{$settings.language}"
       data-fr="téléchargez le fichier .csv  (alt + v)"
@@ -250,7 +245,7 @@ h6 > input {
     </a>
     <a
       href="data:text/plain;charset=utf-8,{encodeURIComponent($data.svg)}"
-      download="{$data.name + today}.svg"
+      download="{$data.name + time()}.svg"
       alt="download svg file"
       role="button"
       data-lang="{$settings.language}"
@@ -261,7 +256,7 @@ h6 > input {
     </a>
     <a
       href="data:text/plain;charset=utf-8,{encodeURIComponent($data.cnc)}"
-      download="{$data.name + today}.cnc"
+      download="{$data.name + time()}.cnc"
       role="button"
       data-lang="{$settings.language}"
       data-fr="telechargez le fichier .cnc (alt + c)"
@@ -278,19 +273,22 @@ h6 > input {
     tabindex="0"
     role="button"
     data-lang="{$settings.language}"
-    data-fr="cnc + projet parametre  (alt + s)"
+    data-fr="cnc + projet parametre  (alt + p)"
     class="file-icon setting-icon"
     class:active="{$settings.show}"
     on:click="{() => ($settings.show = !$settings.show)}">
-    <span>cnc + project settings (alt + s)</span>
+    <span>cnc + project settings (alt + p)</span>
   </div>
 </div>
-<div class="project" bind:this="{project}">
-  {#each [0, 2, 4] as setup}
+<div class="project">
+  {#each [0, 2, 4] as setup, index}
     {#if $data.csv.contents[0][setup]}
-      <h6>
+      <h6 class="print">
         <span>{$data.csv.contents[0][setup]}: </span>
-        <input type="text" bind:value="{$data.csv.contents[0][setup + 1]}" />
+        <input
+          type="text"
+          bind:value="{$data.csv.contents[0][setup + 1]}"
+          bind:this="{project[index]}" />
       </h6>
     {/if}
   {/each}

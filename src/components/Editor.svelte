@@ -45,7 +45,6 @@ function convertUnits() {
   display: flex;
   flex-direction: column;
   height: 90vh;
-  /* justify-content: space-evenly; */
   overflow-y: scroll;
 }
 
@@ -69,14 +68,6 @@ li {
   text-align: center;
   cursor: pointer;
 }
-li small {
-  position: relative;
-  top: -1.5em;
-  /* z-index: 4; */
-  font-size: 0.15em;
-  font-weight: 700;
-}
-
 .header span:hover {
   text-decoration: overline;
 }
@@ -91,13 +82,9 @@ input:hover {
   color: var(--primary-bg);
   background-color: var(--second);
 }
-/* .title {
-  column-span: 3;
-} */
 
 div {
   padding-top: 1rem;
-  /* vertical-align: bottom; */
 }
 
 .switch input {
@@ -130,8 +117,6 @@ input[type='checkbox'] {
   right: 0;
   bottom: 0;
   vertical-align: middle;
-  /* padding-bottom: 0.2rem; */
-  /* background-color: #8ffffd; */
   -webkit-transition: 0.2s;
   transition: 0.2s;
   border: 1px solid var(--primary);
@@ -139,15 +124,8 @@ input[type='checkbox'] {
   border-right: transparent;
   border-bottom-left-radius: 0.2rem;
 }
-.slider:hover:after,
-input:checked + .direction:hover:after {
+.slider:hover:after {
   text-decoration: overline;
-}
-.direction:hover:after,
-select:hover {
-  text-decoration: underline;
-  /* border: 1px solid var(--primary);
-  border-radius: 0.2rem; */
 }
 .slider:before {
   position: absolute;
@@ -174,7 +152,6 @@ input:checked + .slider:before {
   left: 1rem;
   font-weight: 100;
   font-size: var(--medium);
-  /* transform: translate(-50%, 0%); */
 }
 .units[data-lang*='fr']:after {
   content: 'pouces';
@@ -182,10 +159,15 @@ input:checked + .slider:before {
 input:checked + .units:after {
   content: 'mm';
 }
+*[data-lang*='fr']::after {
+  content: '';
+}
+*[data-lang*='fr']::before {
+  content: attr(data-fr);
+}
 </style>
 
 <div class="wrapper">
-  <!-- <div class="input-wrapper"> -->
   <h6 data-lang="{$settings.language}" data-fr="Unités: ">
     <span>Units: </span>
     <label class="switch"><input
@@ -194,10 +176,8 @@ input:checked + .units:after {
         bind:checked="{$settings.units}" />
       <div class="slider units" data-lang="{$settings.language}"></div></label>
   </h6>
-  <!-- </div> -->
 
   <div>
-    <!-- {#if $data.name} -->
     {#if $data.errors.length}
       <h5>ERROR{$data.errors.length > 1 ? 'S' : ''}:</h5>
       {#each $data.errors as error}
@@ -206,19 +186,15 @@ input:checked + .units:after {
     {/if}
 
     <ul class="header">
-      <li on:click="{() => sortAscending(0)}">
-        <span>{$data.csv.contents[4][0]}</span>
-      </li>
+      <li on:click="{() => sortAscending(0)}"><span>{$data.csv.contents[4][0]}</span></li>
       <li on:click="{() => sortDescending(1)}">
         <span>{$data.csv.contents[4][1]}</span>
       </li>
       <li on:click="{() => sortDescending(2)}">
         <span>{$data.csv.contents[4][2]}</span>
-        <!-- <small> {showUnits}</small> -->
       </li>
       <li on:click="{() => sortDescending(3)}">
         <span>{$data.csv.contents[4][3]}</span>
-        <!-- <small> {showUnits}</small> -->
       </li>
     </ul>
     {#each $data.csv.panels as line}
@@ -226,9 +202,7 @@ input:checked + .units:after {
         class="{$settings.activePanel == line[0] ? 'active' : ''}"
         on:mouseenter="{() => ($settings.activePanel = line[0])}"
         on:mouseleave="{() => ($settings.activePanel = '')}">
-        <li>
-          <input type="text" bind:value="{line[0]}" on:focus="{highlight}" />
-        </li>
+        <li><input type="text" bind:value="{line[0]}" on:focus="{highlight}" /></li>
         <li>
           <input
             type="number"
@@ -257,7 +231,6 @@ input:checked + .units:after {
         </li>
       </ul>
     {/each}
-    <!-- {/if} -->
     <ul class="new-row" on:click="{addRow}" role="button">+</ul>
   </div>
 </div>

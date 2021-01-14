@@ -1,23 +1,17 @@
-// tool library
-// missing pass max CUT_TO_DEPTH
-// missing angle
-
 import { localStore } from './localStore.js'
 import { sessionStore } from './sessionStore.js'
 import { cncLibrary } from './cncLibrary.js'
 
 const defaultSettings = {
-  version1: 'update key',
-  language:
-    navigator.language.slice(0, 2) ||
-    navigator.userLanguage.slice(0, 2) ||
-    'en',
+  beta: '< update key to update settings',
+  language: navigator.language.slice(0, 2) || navigator.userLanguage.slice(0, 2) || 'fr',
   material: {
     width: 49,
     height: 97,
     thickness: 0.75,
     margins: 0.3,
     cut_depth: 0.75,
+    link: 0.02,
   },
   nestTypeColumn: false,
   nestOrder: 'widest',
@@ -40,12 +34,11 @@ export const csvTemplate = {
   ],
   fr: [
     ['Projét', 'Nouveau', 'Matèriaux', 'Plaquage', 'Modèle Portes', ''],
-    ['Borders', 'Top', 'Right', 'Bottom', 'Left'],
+    ['Borders', 'haut', 'droit', 'bas', 'gauche'],
     [0, 0, 0, 0, 0],
     ['Metric?', false],
     ['Panneaux', 'Quantité', 'Largeur', 'Hauteur'],
     [1, 0, 0, 0],
-    ,
   ],
 }
 
@@ -54,8 +47,8 @@ const defaultData = {
   sheets: [],
   errors: [],
   csv: {
-    new: { ...csvTemplate },
-    contents: [...csvTemplate.en],
+    new: [...csvTemplate[defaultSettings.language]],
+    contents: [...csvTemplate[defaultSettings.language]],
     panels: [],
     headerRows: 5,
     output: '',
@@ -66,6 +59,3 @@ const defaultData = {
 
 export const settings = localStore('settings', defaultSettings)
 export const data = sessionStore('data', defaultData)
-// export const sheets = sessionStore('sheets', [])
-// export const CSV = sessionStore('csv-file', csvTemplate)
-// export const svg = sessionStore('svg', '')

@@ -16,8 +16,9 @@ export function Gcode(data, settings) {
     Y_HOME = Math.min(settings.material.height + 10, 122),
     SAFE_HEIGHT = settings.material.thickness + 0.25 || 2,
     MATERIAL_HEIGHT = settings.material.thickness,
-    CUT_TO_DEPTH = 0,
-    PRECUT_DEPTH = CUT_TO_DEPTH + 0.02,
+    CUT_TO_DEPTH = cleanFloat(Math.max(MATERIAL_HEIGHT - settings.material.cut_depth, 0)),
+    MAX_PASS_DEPTH = settings.cnc[TOOL_NUMBER].pass_depth,
+    PRECUT_DEPTH = CUT_TO_DEPTH + settings.material.link,
     IS_FRENCH = settings.language.includes('fr')
 
   let output = [...HEADER(TOOL_NUMBER, SPINDLE_SPEED)]
@@ -27,9 +28,7 @@ export function Gcode(data, settings) {
       column.group
         .flat()
         .sort((a, b) =>
-          settings.nestTypeColumn
-            ? columnSort(a, b, index)
-            : rowSort(a, b, index)
+          settings.nestTypeColumn ? columnSort(a, b, index) : rowSort(a, b, index)
         )
         .forEach((panel) => output.push(profileCut(panel)))
     })
@@ -53,26 +52,38 @@ export function Gcode(data, settings) {
       y = cleanFloat(panel.y),
       x_ = cleanFloat(x + panel.width),
       y_ = cleanFloat(y + panel.height),
-      yStart = cleanFloat(y_ - PLUNGE_DISTANCE),
-      // yEnd = cleanFloat(yStart + ),
-      small = panel.width < 5 || panel.height < 5
+      yStart = cleanFloat(y_ - PLUNGE_DISTANCE)
 
-    let smallPass = [
-      PLUNGE_MOVE(x, y_, PRECUT_DEPTH, PLUNGE_RATE),
-      FEED(FEED_RATE),
-      MOVE_X(x_),
-      MOVE_Y(y),
-      MOVE_X(x),
-      MOVE_Y(yStart),
-      // MOVE_Y(yStart),
-    ]
+    function pass() {
+      const contour = (depth) => [
+        PLUNGE_MOVE(x, y_, depth, PLUNGE_RATE),
+        FEED(FEED_RATE),
+        MOVE_X(x_),
+        MOVE_Y(y),
+        MOVE_X(x),
+        MOVE_Y(yStart),
+      ]
+
+      if (!CUT_TO_DEPTH && (panel.width < 5 || panel.height < 5))
+        return contour(PRECUT_DEPTH)
+
+      if (MAX_PASS_DEPTH >= MATERIAL_HEIGHT) return ''
+
+      let passes = [],
+        nextPass = MATERIAL_HEIGHT - MAX_PASS_DEPTH
+      while (nextPass > CUT_TO_DEPTH) {
+        passes.push(contour(nextPass))
+        nextPass -= MAX_PASS_DEPTH
+      }
+      return passes.flat()
+    }
 
     return [
       `( ${IS_FRENCH ? 'coupe panneau' : 'cutting panel'} ${panel.id} )`,
       panel.uniqueID ? `( ${panel.uniqueID} )` : '',
       RAPID_MOVE(x, yStart, SAFE_HEIGHT),
       MOVE_Z(MATERIAL_HEIGHT + 0.02),
-      small ? smallPass : '',
+      pass(),
       PLUNGE_MOVE(x, y_, CUT_TO_DEPTH, PLUNGE_RATE),
       FEED(FEED_RATE),
       MOVE_X(x_),
@@ -91,10 +102,8 @@ export function Gcode(data, settings) {
       `( ${data.name} )`,
       info ? `( ${info} )` : '',
       material
-        ? `( ${SHEETS.length} ${
-            IS_FRENCH ? 'feuilles de' : 'sheets of'
-          } ${material} )`
-        : `( ${SHEETS.length} IS_FRENCH ? 'feuilles a couper' : 'sheets to cut' )`,
+        ? `( ${SHEETS.length} ${IS_FRENCH ? 'feuilles de' : 'sheets of'} ${material} )`
+        : `( ${SHEETS.length} ${IS_FRENCH ? 'feuilles a couper' : 'sheets to cut'} )`,
       `G40 G80 G70`,
       // `G91 G28 Z0`,
       `M06 T${tool}`,
@@ -104,20 +113,13 @@ export function Gcode(data, settings) {
     ]
   }
   function TOOL_CHANGE(tool, speed) {
-    return [
-      `M05`,
-      // `G91 G28 Z0`,
-      `T${tool}`,
-      `G00 G90 G54 S${speed} M03`,
-      `G43 H${tool}`,
-    ]
+    return [`M05`, `T${tool}`, `G00 G90 G54 S${speed} M03`, `G43 H${tool}`]
   }
   function SHEET_CHANGE() {
     return [
       `M05 M104`,
       `G90 X${addPoint(X_HOME)} Y${addPoint(Y_HOME)}`,
       `M00`,
-      // `( Load next sheet and )`,
       `( changez la feuille et )`,
       `( cycle start :)`,
       `M103 M03`,

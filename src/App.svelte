@@ -11,9 +11,9 @@ import { toInches } from './methods.js'
 function update() {
   $data.name = $data.csv.contents[0][1]
   $data.csv.panels = $data.csv.contents.slice($data.csv.headerRows)
+  calculateNest()
   $data.csv.output = $data.csv.contents.join('\n')
   $data.cnc = Gcode($data, $settings)
-  calculateNest()
 }
 
 function calculateNest() {
@@ -23,12 +23,7 @@ function calculateNest() {
 
   function panelsDimensionsInches() {
     if ($settings.units)
-      return $data.csv.panels.map((i) => [
-        i[0],
-        i[1],
-        toInches(i[2]),
-        toInches(i[3]),
-      ])
+      return $data.csv.panels.map((i) => [i[0], i[1], toInches(i[2]), toInches(i[3])])
     return $data.csv.panels
   }
 }
@@ -74,7 +69,7 @@ update()
   z-index: -1;
 }
 h1,
-h5 {
+h6 {
   color: var(--second);
   position: relative;
   left: 20%;
@@ -93,8 +88,8 @@ h5 {
     {#if !$data.sheets.length}
       <div class="splash">
         <div class="splash-img"></div>
-        <h1><span>Holy! Nest:</span></h1>
-        <h5><span>save a sheet or two</span></h5>
+        <h1><span>Ahhh! Nest:</span></h1>
+        <h6><span>sauver une feuille, peut-être deux</span></h6>
       </div>
     {/if}
   </div>
