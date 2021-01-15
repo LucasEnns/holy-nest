@@ -25,7 +25,7 @@ const defaultSettings = {
 
 export const csvTemplate = {
   en: [
-    ['Project', 'New', 'Material', 'Plywood', ''],
+    ['Project', 'New', 'Material', 'Plywood', 'Project Info', 'doors'],
     ['Borders', 'Top', 'Right', 'Bottom', 'Left'],
     [0, 0, 0, 0, 0],
     ['Metric?', false],
