@@ -2,9 +2,15 @@ import { localStore } from './localStore.js'
 import { sessionStore } from './sessionStore.js'
 import { cncLibrary } from './cncLibrary.js'
 
+function setLanguage() {
+  let lang = navigator.language.slice(0, 2) || navigator.userLanguage.slice(0, 2)
+  if (lang.slice(0, 2) === 'fr') return 'fr'
+  return 'en'
+}
+
 const defaultSettings = {
   beta: '< update key to update settings',
-  language: navigator.language.slice(0, 2) || navigator.userLanguage.slice(0, 2) || 'fr',
+  language: setLanguage(),
   material: {
     width: 49,
     height: 97,
