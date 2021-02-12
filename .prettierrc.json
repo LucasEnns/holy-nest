@@ -6,7 +6,7 @@
   "bracketSpacing": true,
   "htmlWhitespaceSensitivity": "css",
   "arrowParens": "always",
-  "printWidth": 90,
+  "printWidth": 80,
   "svelteSortOrder": "scripts-styles-markup",
   "svelteStrictMode": true,
   "svelteBracketNewLine": false,

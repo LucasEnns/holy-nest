@@ -25,8 +25,8 @@ export function isNumber(str) {
 export function trunc(number, places) {
   return Math.round(parseFloat(number) * 10 ** places) / 10 ** places
 }
-export function cleanFloat(num) {
-  return trunc(num, 5)
+export function cleanFloat(num, trailing = 5) {
+  return trunc(num, trailing)
 }
 const removeFromArray = (array, itemValue) => {
   let index = array.indexOf(itemValue)
@@ -38,7 +38,7 @@ export function toMM(number) {
 }
 
 export function toInches(number) {
-  return cleanFloat(number / 25.4)
+  return cleanFloat(number / 25.4, 2)
 }
 
 export function formatDate(date, format) {

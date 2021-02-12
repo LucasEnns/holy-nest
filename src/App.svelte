@@ -23,7 +23,12 @@ function calculateNest() {
 
   function panelsDimensionsInches() {
     if ($settings.units)
-      return $data.csv.panels.map((i) => [i[0], i[1], toInches(i[2]), toInches(i[3])])
+      return $data.csv.panels.map((i) => [
+        i[0],
+        i[1],
+        toInches(i[2]),
+        toInches(i[3]),
+      ])
     return $data.csv.panels
   }
 }
@@ -38,15 +43,21 @@ update()
   right: 0;
   bottom: 0;
   display: grid;
-  grid-template-columns: minmax(24rem, 20vw) 1fr;
+  grid-template-columns: 8rem minmax(24rem, 20vw) 1fr;
   overflow: hidden;
 }
 
 .import {
   position: relative;
-  margin: 0 1.5vw;
-  display: grid;
-  grid-template-rows: minmax(6rem, 10vh) 1fr;
+  margin: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.controls {
+  position: relative;
+  height: 100vh;
+  margin: 2rem 0;
 }
 
 .splash {
@@ -80,8 +91,13 @@ h6 {
 <div class="container">
   <div class="import">
     <Import on:update="{update}" />
-    <Editor on:update="{update}" />
-    <Settings />
+  </div>
+  <div class="controls">
+    {#if $settings.show}
+      <Settings />
+    {:else}
+      <Editor on:update="{update}" />
+    {/if}
   </div>
   <div class="main" on:click="{() => ($settings.show = false)}">
     <Viewer />

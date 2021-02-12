@@ -1,12 +1,14 @@
 <script>
 import { settings, data } from '../stores.js'
 import { toMM, toInches } from '../methods.js'
+import TextInputs from './TextInputs.svelte'
+import CheckInputs from './CheckInputs.svelte'
+import Tooltips from './Tooltips.svelte'
 import { createEventDispatcher } from 'svelte'
 
 const dispatch = createEventDispatcher()
 
-$: metric = $data.csv.contents[3][1]
-$: showUnits = metric ? 'mm' : '//'
+$: metric = JSON.parse($data.csv.contents[3][1])
 $: findMax = (directionStr) => {
   let max = $settings.material[directionStr] - $settings.material.margins * 2
   return metric ? toMM(max) : max
@@ -36,6 +38,7 @@ function convertUnits() {
     index[2] = convert(index[2])
     index[3] = convert(index[3])
   })
+  // toggle boolean
   $data.csv.contents[3][1] = $settings.units = !metric
 }
 </script>
@@ -49,9 +52,10 @@ function convertUnits() {
 }
 
 ul {
+  position: relative;
   font-size: var(--small);
   display: grid;
-  grid-template-columns: 3fr 2fr 5fr 5fr;
+  grid-template-columns: 3fr 2fr 3fr 3fr;
   border-bottom: 1px solid;
 }
 .new-row {
@@ -63,119 +67,60 @@ ul {
 .active {
   background-color: var(--second-bg);
 }
-li {
+li,
+li > * {
+  position: relative;
   line-height: var(--xxlarge);
   text-align: center;
   cursor: pointer;
 }
-.header span:hover {
-  text-decoration: overline;
-}
-
 input {
   width: 100%;
   height: 100%;
   border-radius: 0;
   text-align: center;
 }
+input:after {
+  content: 'in';
+}
 input:hover {
   color: var(--primary-bg);
   background-color: var(--second);
 }
-
+input:hover::selection {
+  color: var(--primary);
+  transition: 0.2s;
+}
 div {
   padding-top: 1rem;
-}
-
-.switch input {
-  top: 0.5em;
-  width: 0.1px;
-  height: 0.1px;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
-  z-index: -1;
-}
-
-input[type='checkbox'] {
-  opacity: 0;
-}
-
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 1.05in;
-  height: 1.5rem;
-  top: 0.4rem;
-  left: 0.3rem;
-}
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  vertical-align: middle;
-  -webkit-transition: 0.2s;
-  transition: 0.2s;
-  border: 1px solid var(--primary);
-  border-top: transparent;
-  border-right: transparent;
-  border-bottom-left-radius: 0.2rem;
-}
-.slider:hover:after {
-  text-decoration: overline;
-}
-.slider:before {
-  position: absolute;
-  content: '';
-  height: 1.5rem;
-  width: 1px;
-  right: 0.05in;
-  top: 0;
-  background-color: var(--primary);
-  -webkit-transition: 0.2s;
-  transition: 0.2s;
-}
-input:checked + .slider:before {
-  -webkit-transform: translateX(-24mm);
-  -ms-transform: translateX(-24mm);
-  transform: translateX(-24mm);
-}
-.slider:after {
-  content: 'inches';
-  color: var(--primary);
-  display: block;
-  position: absolute;
-  top: -0.5rem;
-  left: 1rem;
-  font-weight: 100;
-  font-size: var(--medium);
-}
-.units[data-lang*='fr']:after {
-  content: 'pouces';
-}
-input:checked + .units:after {
-  content: 'mm';
-}
-*[data-lang*='fr']::after {
-  content: '';
-}
-*[data-lang*='fr']::before {
-  content: attr(data-fr);
 }
 </style>
 
 <div class="wrapper">
-  <h6 data-lang="{$settings.language}" data-fr="Unités: ">
-    <span>Units: </span>
+  {#each [0, 2, 4] as setup, index}
+    {#if $data.csv.contents[0][setup]}
+      <TextInputs
+        english="{$data.csv.contents[0][setup]}"
+        french="{$data.csv.contents[0][setup]}"
+        bind:value="{$data.csv.contents[0][setup + 1]}" />
+    {/if}
+  {/each}
+
+  <CheckInputs
+    on="mm"
+    off="{$settings.language.includes('fr') ? 'po' : 'in'}"
+    french="Dimensions"
+    english="Dimensions"
+    on:toggle="{convertUnits}"
+    bind:checked="{$settings.units}" />
+  <!-- <h6 data-lang="{$settings.language}" data-fr="Unités: ">
+    <span></span>
     <label class="switch"><input
         type="checkbox"
         on:change="{convertUnits}"
         bind:checked="{$settings.units}" />
       <div class="slider units" data-lang="{$settings.language}"></div></label>
-  </h6>
+  </h6> -->
 
   <div>
     {#if $data.errors.length}
@@ -186,15 +131,31 @@ input:checked + .units:after {
     {/if}
 
     <ul class="header">
-      <li on:click="{() => sortAscending(0)}"><span>{$data.csv.contents[4][0]}</span></li>
+      <li on:click="{() => sortAscending(0)}">
+        <h1>
+          ⊛
+          <Tooltips french="Nom de panneau" english="Panel Name" />
+        </h1>
+      </li>
       <li on:click="{() => sortDescending(1)}">
-        <span>{$data.csv.contents[4][1]}</span>
+        <h1>
+          ⧉
+          <Tooltips french="Quantité" english="Quantity" />
+        </h1>
       </li>
       <li on:click="{() => sortDescending(2)}">
-        <span>{$data.csv.contents[4][2]}</span>
+        <!-- <h4>∣X∣⍈</h4> -->
+        <h1>
+          ⍈
+          <Tooltips french="Largeur" english="Width" />
+        </h1>
       </li>
       <li on:click="{() => sortDescending(3)}">
-        <span>{$data.csv.contents[4][3]}</span>
+        <!-- <h4>Y⇫⍐</h4> -->
+        <h1>
+          ⍗
+          <Tooltips french="Hauteur" english="Height" />
+        </h1>
       </li>
     </ul>
     {#each $data.csv.panels as line}
@@ -202,7 +163,9 @@ input:checked + .units:after {
         class="{$settings.activePanel == line[0] ? 'active' : ''}"
         on:mouseenter="{() => ($settings.activePanel = line[0])}"
         on:mouseleave="{() => ($settings.activePanel = '')}">
-        <li><input type="text" bind:value="{line[0]}" on:focus="{highlight}" /></li>
+        <li>
+          <input type="text" bind:value="{line[0]}" on:focus="{highlight}" />
+        </li>
         <li>
           <input
             type="number"

@@ -58,6 +58,7 @@ function shift(index) {
 .viewer {
   height: 100vh;
   padding: 2vh 2vw;
+  z-index: -1;
 }
 .infocard {
   position: fixed;
@@ -124,8 +125,16 @@ svg {
 {#if displayInfo}
   <div class="infocard" style="left: {left}px; top: {top}px;">
     <h4>{$data.sheets[id].id}</h4>
-    <p>area des panneaux: {trunc($data.sheets[id].area / 144, 2)} pi<sup>2</sup></p>
-    <p>area de perte: {trunc($data.sheets[id].waste_area / 144, 2)} pi<sup>2</sup></p>
+    <p>
+      area des panneaux:
+      {trunc($data.sheets[id].area / 144, 2)}
+      pi<sup>2</sup>
+    </p>
+    <p>
+      area de perte:
+      {trunc($data.sheets[id].waste_area / 144, 2)}
+      pi<sup>2</sup>
+    </p>
     <p>% de perte: {trunc($data.sheets[id].waste_ratio * 100, 2)}%</p>
   </div>
 {/if}
@@ -156,7 +165,7 @@ svg {
       <g id="panels">
         {#each sheet.group as panel}
           <rect
-            style="stroke-width: {$settings.cnc[$settings.tool].diameter * scale}px;"
+            style="stroke-width: {$settings.cnc[$settings.tools.profile].diameter * scale}px;"
             on:mouseover="{panelHoverOn}"
             on:mouseleave="{panelHoverOff}"
             class="panel {$settings.activePanel == panel.id ? 'active' : ''} print"

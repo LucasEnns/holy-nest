@@ -2,6 +2,7 @@
 import { settings, data } from '../stores.js'
 import { formatDate } from '../methods.js'
 import { CSVToArray } from '../csv.js'
+import Tooltips from './Tooltips.svelte'
 import { createEventDispatcher } from 'svelte'
 
 const dispatch = createEventDispatcher()
@@ -17,7 +18,7 @@ let badFile = false,
   open
 
 function updatePanels() {
-  $settings.units = $data.csv.contents[3][1]
+  $settings.units = JSON.parse($data.csv.contents[3][1])
   dispatch('update')
 }
 
@@ -35,14 +36,14 @@ function handleKeyDown(e) {
 function handleKeyUp(e) {
   delete keys[e.code]
 }
-
 function newFile() {
   $data.csv.contents = [...$data.csv.new]
   updatePanels()
-  project[0].focus()
+  // project[0].focus()
 }
 
 function loadFile() {
+  console.log(open.files[0])
   if (!open.files[0]) return
   if (open.files[0].name.includes('.csv')) {
     let reader = new FileReader()
@@ -61,10 +62,12 @@ function loadFile() {
 <style>
 .file-mgmt {
   display: flex;
+  flex-direction: column;
   vertical-align: center;
   align-items: center;
   text-align: center;
   justify-content: space-between;
+  height: 26rem;
 }
 
 .file-icon {
@@ -95,40 +98,6 @@ input:focus + .file-icon {
   position: absolute;
   z-index: -1;
 }
-.file-icon > span,
-.file-icon::after,
-.file-icon:before {
-  position: absolute;
-  left: 4.6rem;
-  top: 4.1rem;
-  white-space: nowrap;
-  transition: 0.1s;
-  outline: none;
-  background-color: var(--primary);
-  color: var(--primary-bg);
-  font-size: var(--small);
-  font-weight: 600;
-  padding: var(--xsmall);
-  border-radius: var(--xsmall);
-  opacity: 0;
-  z-index: 3;
-  pointer-events: none;
-}
-.file-icon:before {
-  transform: skewX(30deg);
-  border-radius: 0;
-  width: 0.5rem;
-  height: 0.5rem;
-  content: '';
-}
-.file-icon:hover > span,
-.file-icon:hover::after,
-.file-icon:hover:before {
-  opacity: 1;
-  transition: 0.1s;
-  transition-delay: 0.7s;
-}
-
 .blocked {
   cursor: default;
 }
@@ -208,6 +177,16 @@ h6 > input {
 <svelte:window on:keydown="{handleKeyDown}" on:keyup="{handleKeyUp}" />
 
 <div class="file-mgmt">
+  <div
+    tabindex="0"
+    role="button"
+    class="file-icon setting-icon"
+    class:active="{$settings.show}"
+    on:click="{() => ($settings.show = !$settings.show)}">
+    <Tooltips
+      french="ncnc + projet parametre  (alt + p)"
+      english="cnc + project settings (alt + p)" />
+  </div>
   <input
     class="inputfile"
     name="file"
@@ -217,70 +196,54 @@ h6 > input {
     bind:this="{open}" />
   <label
     for="file"
-    data-lang="{$settings.language}"
-    data-fr="ouvrir fichier .csv (alt + o)"
     class="file-icon {badFile ? 'badfile' : 'upload'}"
     on:mouseover="{() => (badFile = false)}">
-    <span>open .csv file (alt + o)</span>
+    <Tooltips
+      french="ouvrir fichier .csv (alt + o)"
+      english="open .csv file (alt + o)" />
   </label>
-  <div
-    tabindex="0"
-    role="button"
-    data-lang="{$settings.language}"
-    data-fr="nouveau fichier (alt + n)"
-    class="file-icon new"
-    on:click="{newFile}">
-    <span>new file (alt + n)</span>
+  <div tabindex="0" role="button" class="file-icon new" on:click="{newFile}">
+    <Tooltips french="nouveau fichier (alt + n)" english="new file (alt + n)" />
   </div>
   {#if $data.sheets.length}
     <a
       href="data:text/plain;charset=utf-8,{encodeURIComponent($data.csv.output)}"
       download="{$data.name + time()}.csv"
       role="button"
-      data-lang="{$settings.language}"
-      data-fr="téléchargez le fichier .csv  (alt + v)"
       class="file-icon dl-csv"
       bind:this="{dlCSV}">
-      <span>download .csv file (alt + v)</span>
+      <Tooltips
+        french="téléchargez le fichier .csv  (alt + v)"
+        english="download .csv file (alt + v)" />
     </a>
     <a
       href="data:text/plain;charset=utf-8,{encodeURIComponent($data.svg)}"
       download="{$data.name + time()}.svg"
       alt="download svg file"
       role="button"
-      data-lang="{$settings.language}"
-      data-fr="telechargez le fichier .svg (alt + g)"
       class="file-icon dl-svg"
       bind:this="{dlSVG}">
-      <span>download .svg file (alt + g)</span>
+      <Tooltips
+        french="telechargez le fichier .svg (alt + g)"
+        english="download .svg file (alt + g)" />
     </a>
     <a
       href="data:text/plain;charset=utf-8,{encodeURIComponent($data.cnc)}"
       download="{$data.name + time()}.cnc"
       role="button"
-      data-lang="{$settings.language}"
-      data-fr="telechargez le fichier .cnc (alt + c)"
       class="file-icon dl-cnc"
       bind:this="{dlCNC}">
-      <span>download .cnc file (alt + c)</span>
+      <Tooltips
+        french="ntelechargez le fichier .cnc (alt + c)"
+        english="download .cnc file (alt + c)" />
     </a>
   {:else}
     <div class="file-icon dl-csv-block blocked"></div>
     <div class="file-icon dl-svg-block blocked"></div>
     <div class="file-icon dl-cnc-block blocked"></div>
   {/if}
-  <div
-    tabindex="0"
-    role="button"
-    data-lang="{$settings.language}"
-    data-fr="cnc + projet parametre  (alt + p)"
-    class="file-icon setting-icon"
-    class:active="{$settings.show}"
-    on:click="{() => ($settings.show = !$settings.show)}">
-    <span>cnc + project settings (alt + p)</span>
-  </div>
 </div>
-<div class="project">
+<!-- <div class="project">
   {#each [0, 2, 4] as setup, index}
     {#if $data.csv.contents[0][setup]}
       <h6 class="print">
@@ -292,4 +255,4 @@ h6 > input {
       </h6>
     {/if}
   {/each}
-</div>
+</div> -->

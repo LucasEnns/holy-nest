@@ -60,7 +60,7 @@ export const cncLibrary = {
     step_over: 0,
   },
   6: {
-    name: '1/4" Endmill',
+    name: '1/4" End mill',
     type: 'Endmill',
     diameter: 0.25,
     spindle: 18000,
@@ -96,7 +96,7 @@ export const cncLibrary = {
     step_over: 0,
   },
   9: {
-    name: '3/8" Endmill',
+    name: '3/8" End mill',
     type: 'Endmill',
     diameter: 0.375,
     spindle: 18000,
@@ -108,7 +108,7 @@ export const cncLibrary = {
     step_over: 0.3,
   },
   10: {
-    name: '1/2" Endmill',
+    name: '1/2" End mill',
     type: 'Endmill',
     diameter: 0.5,
     spindle: 18000,
