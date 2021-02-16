@@ -7,13 +7,16 @@ export const localStore = (key, initial) => {
     localStorage.setItem(key, str(initial))
   }
 
-  const localKey = JSON.parse(localStorage.getItem(key))
+  function localKey() {
+    return JSON.parse(localStorage.getItem(key))
+  }
   // reset with initial value as string if settings updated
-  if (!sameKeys(localKey, initial)) {
+  if (!sameKeys(localKey(), initial)) {
+    console.log(localKey(), initial)
     localStorage.setItem(key, str(initial))
   }
   // create the writable store
-  const { subscribe, set, update } = writable(localKey)
+  const { subscribe, set, update } = writable(localKey())
 
   return {
     subscribe,

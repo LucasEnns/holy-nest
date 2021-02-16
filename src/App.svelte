@@ -101,10 +101,7 @@ h6 {
     <Import on:update="{update}" />
   </div>
   <div class="controls">
-    {#if $settings.show}
-      <Settings on:update="{update}" />
-      <!-- {:else } -->
-    {/if}
+    <Settings on:update="{update}" />
     <Editor on:update="{update}" />
   </div>
   <div class="main" on:click="{() => ($settings.show = false)}">

@@ -32,6 +32,18 @@ function convertUnit(unit, value) {
   let convert = unit ? toInches : toMM
   return convert(value)
 }
+
+function activeEngraver() {
+  activeLibraryTool($settings.tools.engraver)
+}
+
+function activeProfile() {
+  activeLibraryTool($settings.tools.profile)
+}
+
+function activeLibraryTool(activate) {
+  $settings.tools.tool = activate
+}
 </script>
 
 <style>
@@ -127,8 +139,8 @@ option {
       english="Project" />
     <div class="subsetting" class:active="{$settings.subsettings.project}">
       <TextInputs
-        english="Billing ID"
-        french="Facture ID"
+        english="Billing #"
+        french="Facture #"
         bind:value="{$data.csv.contents[0][1]}" />
       <TextInputs
         english="{$data.csv.contents[0][4] ? $data.csv.contents[0][4] : 'Product'}"
@@ -238,7 +250,10 @@ option {
       <h5>
         {french ? 'Outil:' : 'Tool:'}
         <span class="spread">{''}</span>
-        <select bind:value="{$settings.tools.profile}">
+        <!-- svelte-ignore a11y-no-onchange -->
+        <select
+          bind:value="{$settings.tools.profile}"
+          on:change="{activeProfile}">
           {#each Object.keys($settings.cnc) as tool}
             {#if $settings.cnc[tool].type.includes('mill')}
               <option value="{tool}">
@@ -283,7 +298,10 @@ option {
       <h5>
         {french ? 'Outil:' : 'Tool:'}
         <span class="spread">{''}</span>
-        <select bind:value="{$settings.tools.engraver}">
+        <!-- svelte-ignore a11y-no-onchange -->
+        <select
+          bind:value="{$settings.tools.engraver}"
+          on:change="{activeEngraver}">
           {#each Object.keys($settings.cnc) as tool}
             {#if $settings.cnc[tool].type.includes('nose') || $settings.cnc[tool].type.includes('V-')}
               <option value="{tool}">
@@ -310,7 +328,7 @@ option {
         step="0.125"
         measurement="{'"'}" />
       <NumInputs
-        english="Placement from"
+        english="Placement from bottom"
         french="Placement de bas"
         bind:value="{$data.tools.engraver.yStart}"
         max="10"

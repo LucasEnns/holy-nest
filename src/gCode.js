@@ -19,6 +19,7 @@ export function Gcode(data, settings) {
     ),
     MAX_PASS_DEPTH = settings.cnc[CURRENT_TOOL].pass_depth,
     LINK_DEPTH = PROFILE_DEPTH + data.tools.profile.link,
+    SMALL_PANEL = data.tools.profile.min_size,
     PROFILE_TOOL = settings.tools.profile,
     ENGRAVE = data.tools.engraver.engrave,
     ENGRAVE_TOOL = settings.tools.engraver
@@ -36,8 +37,12 @@ export function Gcode(data, settings) {
             (panel) =>
               (output += ENGRAVE_LABEL({
                 label: panel.id,
+                engravingDepth: data.tools.engraver.cut_depth,
                 xStart: panel.x + 1,
                 yStart: panel.y + 1,
+                size: data.tools.engraver.size,
+                spacing: data.tools.engraver.spacing,
+                direction: data.tools.engraver.direction,
               }))
           )
       })
@@ -87,7 +92,8 @@ export function Gcode(data, settings) {
         passes = '',
         depth = MATERIAL_HEIGHT,
         smallPanel = () =>
-          depth === PROFILE_DEPTH && (panel.width < 8 || panel.height < 8)
+          depth === PROFILE_DEPTH &&
+          (panel.width < SMALL_PANEL || panel.height < SMALL_PANEL)
       while (!fullDepth) {
         depth = Math.max(depth - MAX_PASS_DEPTH, PROFILE_DEPTH)
         if (smallPanel()) passes += contour(LINK_DEPTH)
@@ -103,7 +109,7 @@ export function Gcode(data, settings) {
     xStart = 1,
     yStart = 1,
     size = 0.3,
-    spacing = 0.75,
+    spacing = 0.1,
     direction = 'ltr',
   }) {
     return engravingGcode()
@@ -200,11 +206,7 @@ export function Gcode(data, settings) {
       `( ${data.name} )\n` +
       `${info ? `( ${info} )\n` : ''}` +
       `( ------------------ )\n` +
-      `G40 G80 G70 G20\n` +
-      // `M06 T${CURRENT_TOOL}\n` +
-      // `G43 H${CURRENT_TOOL}\n` +
-      // `S${SPINDLE_SPEED()} M03\n` +
-      // `G54 G90 G00\n` +
+      `G40 G80 G70\n` +
       `( ------------------ )\n` +
       `( ${SHEETS.length}: [] ${material ? material : ''} )\n`
     )

@@ -10,7 +10,7 @@ function setLanguage() {
 }
 
 const defaultSettings = {
-  beta1: '< update key to update settings',
+  BETA2: '< update key to update settings',
   language: setLanguage(),
   material: {
     width: 49,
@@ -22,10 +22,10 @@ const defaultSettings = {
   nestOrder: 'widest',
   nestDirectionBottom: true,
   units: false,
-  tools: { profile: 9, engraver: 3, tool: 1 },
+  tools: { profile: '9', engraver: '3', tool: '9' },
   cnc: cncLibrary,
   subsettings: {
-    show: true,
+    show: false,
     project: true,
     profile: false,
     engraver: false,
