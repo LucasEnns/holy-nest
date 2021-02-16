@@ -2,6 +2,7 @@ export const cncLibrary = {
   1: {
     name: '3/16" End mill',
     type: 'End mill',
+    mm: false,
     diameter: 0.1875,
     spindle: 12000,
     feed: 150,
@@ -14,6 +15,7 @@ export const cncLibrary = {
   2: {
     name: '3/4" End mill',
     type: 'End mill',
+    mm: false,
     diameter: 0.75,
     spindle: 15000,
     feed: 200,
@@ -26,6 +28,7 @@ export const cncLibrary = {
   3: {
     name: '1/8" Engraver/Drill',
     type: 'Ballnose',
+    mm: false,
     diameter: 0.125,
     spindle: 12000,
     feed: 50,
@@ -38,6 +41,7 @@ export const cncLibrary = {
   4: {
     name: '3/4" Edge Finisher',
     type: 'Edge Finisher',
+    mm: false,
     diameter: 0.75,
     spindle: 20000,
     feed: 75,
@@ -50,7 +54,8 @@ export const cncLibrary = {
   5: {
     name: '5mm Drill',
     type: 'Drill',
-    diameter: 0.19685,
+    mm: true,
+    diameter: 5,
     spindle: 8500,
     feed: 0,
     plunge: 75,
@@ -62,6 +67,7 @@ export const cncLibrary = {
   6: {
     name: '1/4" End mill',
     type: 'Endmill',
+    mm: false,
     diameter: 0.25,
     spindle: 18000,
     feed: 150,
@@ -74,7 +80,8 @@ export const cncLibrary = {
   7: {
     name: '8mm Drill',
     type: 'Drill',
-    diameter: 0.31496,
+    mm: true,
+    diameter: 8,
     spindle: 8500,
     feed: 0,
     plunge: 75,
@@ -86,7 +93,8 @@ export const cncLibrary = {
   8: {
     name: '32mm Surfacing',
     type: 'Surfacing',
-    diameter: 1.25985,
+    mm: true,
+    diameter: 32,
     spindle: 12000,
     feed: 200,
     plunge: 30,
@@ -98,6 +106,7 @@ export const cncLibrary = {
   9: {
     name: '3/8" End mill',
     type: 'Endmill',
+    mm: false,
     diameter: 0.375,
     spindle: 18000,
     feed: 400,
@@ -110,6 +119,7 @@ export const cncLibrary = {
   10: {
     name: '1/2" End mill',
     type: 'Endmill',
+    mm: false,
     diameter: 0.5,
     spindle: 18000,
     feed: 400,
@@ -122,7 +132,8 @@ export const cncLibrary = {
   11: {
     name: '10mm Drill',
     type: 'Drill',
-    diameter: 0.3937,
+    mm: true,
+    diameter: 10,
     spindle: 18000,
     feed: 0,
     plunge: 75,
@@ -134,6 +145,7 @@ export const cncLibrary = {
   12: {
     name: '90deg 1.5" V-bit',
     type: 'V-bit',
+    mm: false,
     diameter: 1.5,
     spindle: 12000,
     feed: 75,

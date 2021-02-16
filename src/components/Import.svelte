@@ -30,20 +30,20 @@ function handleKeyDown(e) {
   if (key('KeyV')) dlCSV.click()
   if (key('KeyG')) dlSVG.click()
   if (key('KeyC')) dlCNC.click()
-  if (key('KeyP')) $settings.show = !$settings.show
+  if (key('KeyP')) $settings.subsettings.show = !$settings.subsettings.show
 }
 
 function handleKeyUp(e) {
   delete keys[e.code]
 }
+
 function newFile() {
   $data.csv.contents = [...$data.csv.new]
   updatePanels()
-  // project[0].focus()
+  dispatch('name')
 }
 
 function loadFile() {
-  console.log(open.files[0])
   if (!open.files[0]) return
   if (open.files[0].name.includes('.csv')) {
     let reader = new FileReader()
@@ -67,7 +67,7 @@ function loadFile() {
   align-items: center;
   text-align: center;
   justify-content: space-between;
-  height: 26rem;
+  height: 22rem;
 }
 
 .file-icon {
@@ -82,7 +82,6 @@ function loadFile() {
 }
 .file-icon:hover,
 .file-icon:focus,
-.setting-icon.active,
 input:focus + .file-icon {
   height: 2.5em;
   width: 2.3em;
@@ -154,20 +153,8 @@ input:focus + .file-icon {
 .setting-icon {
   background-image: url('../img/settings.png');
 }
-.setting-icon:hover,
-.setting-icon.active {
+.setting-icon:hover {
   background-image: url('../img/settings-hover.png');
-}
-h6 {
-  white-space: nowrap;
-  display: flex;
-}
-h6 > input {
-  width: 2%;
-  flex: 2 !important;
-
-  font-size: 1.3em;
-  text-align: left;
 }
 </style>
 
@@ -177,16 +164,15 @@ h6 > input {
 <svelte:window on:keydown="{handleKeyDown}" on:keyup="{handleKeyUp}" />
 
 <div class="file-mgmt">
-  <div
+  <!-- <div
     tabindex="0"
     role="button"
     class="file-icon setting-icon"
-    class:active="{$settings.show}"
     on:click="{() => ($settings.show = !$settings.show)}">
     <Tooltips
       french="ncnc + projet parametre  (alt + p)"
       english="cnc + project settings (alt + p)" />
-  </div>
+  </div> -->
   <input
     class="inputfile"
     name="file"
@@ -243,16 +229,3 @@ h6 > input {
     <div class="file-icon dl-cnc-block blocked"></div>
   {/if}
 </div>
-<!-- <div class="project">
-  {#each [0, 2, 4] as setup, index}
-    {#if $data.csv.contents[0][setup]}
-      <h6 class="print">
-        <span>{$data.csv.contents[0][setup]}: </span>
-        <input
-          type="text"
-          bind:value="{$data.csv.contents[0][setup + 1]}"
-          bind:this="{project[index]}" />
-      </h6>
-    {/if}
-  {/each}
-</div> -->

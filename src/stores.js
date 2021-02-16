@@ -24,8 +24,9 @@ const defaultSettings = {
   units: false,
   tools: { profile: 9, engraver: 3, tool: 1 },
   cnc: cncLibrary,
-  show: true,
   subsettings: {
+    show: true,
+    project: true,
     profile: false,
     engraver: false,
     library: false,
@@ -66,10 +67,10 @@ const defaultData = {
       xStart: 1,
       yStart: 1,
       size: 0.3,
-      spacing: 0.75,
+      spacing: 0.1,
       direction: 'ltr',
     },
-    profile: { tool: 9, cut_depth: 0.75, link: 0.02, min_size: 8 },
+    profile: { tool: 9, cut_depth: 0.75, link: 0.02, min_size: 12 },
   },
   csv: {
     new: [...csvTemplate[defaultSettings.language]],

@@ -9,21 +9,28 @@ import { settings } from '../stores.js'
 // }
 
 export let english = '',
-  french = ''
+  french = '',
+  under = false
 </script>
 
 <style>
 .tooltip {
+  z-index: 99;
   opacity: 0;
-  /* display: none; */
+  position: absolute;
+  left: 140%;
+  top: 50%;
+}
+
+.under {
+  left: 80%;
+  top: 100%;
 }
 
 .tip,
 .pointer {
   z-index: 99;
-  position: absolute;
-  left: 110%;
-  top: 100%;
+  position: fixed;
   white-space: nowrap;
   transition: 0.1s;
   outline: none;
@@ -36,21 +43,18 @@ export let english = '',
   pointer-events: none;
 }
 .pointer {
-  transform: skewX(30deg);
-  border-radius: 0;
-  width: 0.5rem;
-  height: 0.5rem;
+  transform: skew(30deg);
+  border-radius: 0.2rem;
   content: '';
 }
 *:hover > .tooltip {
-  /* display: block; */
   opacity: 1;
   transition: 0.1s;
   transition-delay: 1s;
 }
 </style>
 
-<div class="tooltip">
+<div class="tooltip" class:under>
   <div class="pointer"></div>
   <div class="tip">{$settings.language.includes('fr') ? french : english}</div>
 </div>

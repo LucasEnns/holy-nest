@@ -12,6 +12,9 @@ export let open,
 function toggle() {
   dispatch('toggle')
 }
+function focused() {
+  dispatch('focused')
+}
 </script>
 
 <style>
@@ -31,10 +34,14 @@ h3 span {
   font-weight: 100;
   font-style: normal;
 }
+/* .drop:focus, */
 .drop:hover,
 .open {
+  outline: none;
   border-bottom: 1px solid var(--primary);
+  margin-bottom: 0.4em;
 }
+/* .drop:focus .end, */
 .drop:hover .end {
   opacity: 1;
   color: var(--third);
@@ -42,17 +49,18 @@ h3 span {
   font-size: var(--xxlarge);
 }
 .end {
+  /* position: relative; */
   opacity: 0;
   right: 0;
   font-size: var(--xlarge);
-  vertical-align: middle;
+  /* vertical-align: 0.5em; */
 }
 </style>
 
-<div class="drop" class:open on:click="{toggle}">
+<div class="drop" class:open on:click="{toggle}" on:focus="{focused}">
   <h3>
     <span>{icon} </span>
     {$settings.language.includes('fr') ? french : english}
   </h3>
-  <span class="end">{open ? '-' : '+'}</span>
+  <span class="end">{open ? '⩓' : '⩔'}</span>
 </div>

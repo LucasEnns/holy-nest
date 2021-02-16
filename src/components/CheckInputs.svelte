@@ -25,33 +25,37 @@ h5 {
 }
 .switch {
   position: relative;
+  width: 2%;
+  flex: 2 !important;
+}
+/* .switch {
+  position: relative;
   display: inline-block;
   width: 1.05in;
   height: 1.5rem;
-}
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  vertical-align: middle;
-  -webkit-transition: 0.2s;
-  transition: 0.2s;
-}
-.slider:hover:after {
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
+} */
 .slider:after {
-  color: var(--primary);
-  display: block;
   position: absolute;
-  left: 1rem;
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: var(--primary);
+  text-align: right;
   font-weight: 100;
   font-size: var(--medium);
   content: attr(data-content);
+  padding: 0 1rem;
+  cursor: pointer;
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
+}
+input:focus + .slider:after,
+.slider:hover:after {
+  text-decoration: underline;
+  text-underline-offset: 0.1em;
+}
+input:focus + .slider:after {
+  color: var(--third);
 }
 input[type='checkbox'] {
   top: 0.5em;
@@ -66,9 +70,7 @@ input[type='checkbox'] {
 
 <h5>
   {$settings.language.includes('fr') ? french : english}{separator}
-  <label class="switch"><input
-      type="checkbox"
-      on:click="{toggle}"
-      bind:checked />
+  <label class="switch">
+    <input type="checkbox" on:click="{toggle}" bind:checked />
     <div class="slider" data-content="{checked ? on : off}"></div></label>
 </h5>

@@ -1,16 +1,26 @@
 <script>
 import { settings } from '../stores'
-
+import { createEventDispatcher } from 'svelte'
+const dispatch = createEventDispatcher()
 export let value,
   min = 0,
   max,
   step,
   english = '',
   french = '',
-  measurement = ''
+  measurement = '',
+  unit = ''
 
 function highlight() {
   this.select()
+}
+
+function changed() {
+  dispatch('changed')
+}
+function convert() {
+  dispatch('convert')
+  unit = !unit
 }
 </script>
 
@@ -20,16 +30,19 @@ h5 {
   padding-left: 2rem;
   white-space: nowrap;
   display: flex;
-  /* width: fit-content; */
 }
-h5 > input {
+input {
   width: 2%;
   flex: 2 !important;
   text-align: right;
 }
-input:hover {
-  color: var(--primary);
-  background-color: var(--primary-bg);
+span {
+  cursor: pointer;
+  padding-right: 1rem;
+}
+input:hover,
+input:focus {
+  text-underline-offset: 0.1em;
   text-decoration: underline;
 }
 </style>
@@ -39,9 +52,10 @@ input:hover {
   <input
     type="number"
     on:click="{highlight}"
+    on:change="{changed}"
     bind:value
     min="{min}"
     max="{max}"
     step="{step}" />
-  {measurement}
+  <span on:click="{convert}">{measurement}</span>
 </h5>

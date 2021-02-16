@@ -34,11 +34,11 @@ const removeFromArray = (array, itemValue) => {
 }
 
 export function toMM(number) {
-  return cleanFloat(number * 25.4)
+  return cleanFloat(number * 25.4, 3)
 }
 
 export function toInches(number) {
-  return cleanFloat(number / 25.4, 2)
+  return cleanFloat(number / 25.4)
 }
 
 export function formatDate(date, format) {

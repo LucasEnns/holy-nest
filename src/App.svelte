@@ -52,12 +52,20 @@ update()
   margin: 2rem;
   display: flex;
   flex-direction: column;
+  z-index: 3;
 }
 
 .controls {
   position: relative;
-  height: 100vh;
+  /* height: calc(100vh - 4rem); */
   margin: 2rem 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  z-index: 2;
+}
+
+.main {
+  z-index: -1;
 }
 
 .splash {
@@ -94,10 +102,10 @@ h6 {
   </div>
   <div class="controls">
     {#if $settings.show}
-      <Settings />
-    {:else}
-      <Editor on:update="{update}" />
+      <Settings on:update="{update}" />
+      <!-- {:else } -->
     {/if}
+    <Editor on:update="{update}" />
   </div>
   <div class="main" on:click="{() => ($settings.show = false)}">
     <Viewer />

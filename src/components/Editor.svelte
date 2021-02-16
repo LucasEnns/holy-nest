@@ -4,6 +4,7 @@ import { toMM, toInches } from '../methods.js'
 import TextInputs from './TextInputs.svelte'
 import CheckInputs from './CheckInputs.svelte'
 import Tooltips from './Tooltips.svelte'
+import Headers from './Headers.svelte'
 import { createEventDispatcher } from 'svelte'
 
 const dispatch = createEventDispatcher()
@@ -45,14 +46,11 @@ function convertUnits() {
 
 <style>
 .wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 90vh;
-  overflow-y: scroll;
+  height: max-content;
+  padding: 0;
 }
 
 ul {
-  position: relative;
   font-size: var(--small);
   display: grid;
   grid-template-columns: 3fr 2fr 3fr 3fr;
@@ -67,8 +65,7 @@ ul {
 .active {
   background-color: var(--second-bg);
 }
-li,
-li > * {
+li {
   position: relative;
   line-height: var(--xxlarge);
   text-align: center;
@@ -94,37 +91,16 @@ input:hover::selection {
 div {
   padding-top: 1rem;
 }
+.error,
+.error + p {
+  color: var(--third);
+}
 </style>
 
 <div class="wrapper">
-  {#each [0, 2, 4] as setup, index}
-    {#if $data.csv.contents[0][setup]}
-      <TextInputs
-        english="{$data.csv.contents[0][setup]}"
-        french="{$data.csv.contents[0][setup]}"
-        bind:value="{$data.csv.contents[0][setup + 1]}" />
-    {/if}
-  {/each}
-
-  <CheckInputs
-    on="mm"
-    off="{$settings.language.includes('fr') ? 'po' : 'in'}"
-    french="Dimensions"
-    english="Dimensions"
-    on:toggle="{convertUnits}"
-    bind:checked="{$settings.units}" />
-  <!-- <h6 data-lang="{$settings.language}" data-fr="Unités: ">
-    <span></span>
-    <label class="switch"><input
-        type="checkbox"
-        on:change="{convertUnits}"
-        bind:checked="{$settings.units}" />
-      <div class="slider units" data-lang="{$settings.language}"></div></label>
-  </h6> -->
-
   <div>
     {#if $data.errors.length}
-      <h5>ERROR{$data.errors.length > 1 ? 'S' : ''}:</h5>
+      <h5 class="error">ERROR{$data.errors.length > 1 ? 'S' : ''}:</h5>
       {#each $data.errors as error}
         <p>{error}</p>
       {/each}
@@ -134,27 +110,36 @@ div {
       <li on:click="{() => sortAscending(0)}">
         <h1>
           ⊛
-          <Tooltips french="Nom de panneau" english="Panel Name" />
+          <Tooltips
+            under="{true}"
+            french="Nom de panneau"
+            english="Panel Name" />
         </h1>
       </li>
       <li on:click="{() => sortDescending(1)}">
         <h1>
           ⧉
-          <Tooltips french="Quantité" english="Quantity" />
+          <Tooltips under="{true}" french="Quantité" english="Quantity" />
         </h1>
       </li>
       <li on:click="{() => sortDescending(2)}">
         <!-- <h4>∣X∣⍈</h4> -->
         <h1>
           ⍈
-          <Tooltips french="Largeur" english="Width" />
+          <Tooltips
+            under="{true}"
+            french="Largeur ({metric ? 'mm' : 'po'})"
+            english="Width ({metric ? 'mm' : 'in'})" />
         </h1>
       </li>
       <li on:click="{() => sortDescending(3)}">
         <!-- <h4>Y⇫⍐</h4> -->
         <h1>
           ⍗
-          <Tooltips french="Hauteur" english="Height" />
+          <Tooltips
+            under="{true}"
+            french="Hauteur ({metric ? 'mm' : 'po'})"
+            english="Height ({metric ? 'mm' : 'in'})" />
         </h1>
       </li>
     </ul>
@@ -165,6 +150,10 @@ div {
         on:mouseleave="{() => ($settings.activePanel = '')}">
         <li>
           <input type="text" bind:value="{line[0]}" on:focus="{highlight}" />
+          <Tooltips
+            under="{true}"
+            french="Nom de panneau"
+            english="Panel Name" />
         </li>
         <li>
           <input
@@ -173,6 +162,7 @@ div {
             max="100"
             bind:value="{line[1]}"
             on:focus="{highlight}" />
+          <Tooltips under="{true}" french="Quantité" english="Quantity" />
         </li>
         <li>
           <input
@@ -182,6 +172,10 @@ div {
             bind:value="{line[2]}"
             on:focus="{highlight}"
             step="{metric ? 0.25 : 0.03125}" />
+          <Tooltips
+            under="{true}"
+            french="Largeur ({metric ? 'mm' : 'po'})"
+            english="Width ({metric ? 'mm' : 'in'})" />
         </li>
         <li>
           <input
@@ -191,6 +185,10 @@ div {
             bind:value="{line[3]}"
             on:focus="{highlight}"
             step="{metric ? 0.25 : 0.03125}" />
+          <Tooltips
+            under="{true}"
+            french="Hauteur ({metric ? 'mm' : 'po'})"
+            english="Height ({metric ? 'mm' : 'in'})" />
         </li>
       </ul>
     {/each}
