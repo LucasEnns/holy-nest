@@ -10,10 +10,13 @@ export function Gcode(data, settings) {
     FEED_RATE = () => settings.cnc[CURRENT_TOOL].feed,
     PLUNGE_RATE = () => settings.cnc[CURRENT_TOOL].plunge,
     PLUNGE_DISTANCE = () => settings.cnc[CURRENT_TOOL].ramp,
+    X_OFFSET = settings.offset.X,
+    Y_OFFSET = settings.offset.Y,
+    Z_OFFSET = settings.offset.Z,
     X_HOME = settings.material.width / 2 || 30.0,
     Y_HOME = Math.min(settings.material.height + 10, 122),
-    SAFE_HEIGHT = settings.material.thickness + 0.25 || 2,
-    MATERIAL_HEIGHT = settings.material.thickness,
+    MATERIAL_HEIGHT = settings.material.thickness + Z_OFFSET,
+    SAFE_HEIGHT = MATERIAL_HEIGHT + 0.25,
     PROFILE_DEPTH = cleanFloat(
       Math.max(MATERIAL_HEIGHT - data.tools.profile.cut_depth, 0)
     ),
@@ -38,8 +41,8 @@ export function Gcode(data, settings) {
               (output += ENGRAVE_LABEL({
                 label: panel.id,
                 engravingDepth: data.tools.engraver.cut_depth,
-                xStart: panel.x + 1,
-                yStart: panel.y + 1,
+                xStart: panel.x + 1 + X_OFFSET,
+                yStart: panel.y + 1 + Y_OFFSET,
                 size: data.tools.engraver.size,
                 spacing: data.tools.engraver.spacing,
                 direction: data.tools.engraver.direction,
@@ -58,15 +61,15 @@ export function Gcode(data, settings) {
   })
   output += FOOTER()
 
-  return output
+  return output.replace('M05\n', '')
 
   ///////////////////////////////////
   //    helpers to write g-code
   //////////////////////////////////
 
   function PROFILE_CUT(panel) {
-    const x = cleanFloat(panel.x),
-      y = cleanFloat(panel.y),
+    const x = cleanFloat(panel.x + X_OFFSET),
+      y = cleanFloat(panel.y + Y_OFFSET),
       x_ = cleanFloat(x + panel.width),
       y_ = cleanFloat(y + panel.height),
       yStart = cleanFloat(y_ - PLUNGE_DISTANCE())

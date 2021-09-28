@@ -10,7 +10,7 @@ function setLanguage() {
 }
 
 const defaultSettings = {
-  BETA2: '< update key to update settings',
+  BETA3: '< update key to update settings',
   language: setLanguage(),
   material: {
     width: 49,
@@ -22,6 +22,11 @@ const defaultSettings = {
   nestOrder: 'widest',
   nestDirectionBottom: true,
   units: false,
+  offset: {
+    X: 0,
+    Y: 0,
+    Z: 0,
+  },
   tools: { profile: '9', engraver: '3', tool: '9' },
   cnc: cncLibrary,
   subsettings: {
@@ -32,6 +37,7 @@ const defaultSettings = {
     library: false,
     sheet: false,
     nest: true,
+    offset: false,
   },
   activePanel: '',
 }
@@ -49,7 +55,7 @@ export const csvTemplate = {
     ['Projét', 'Nouveau', 'Matèriaux', 'Plaquage', 'Modèle Portes', ''],
     ['Borders', 'haut', 'droit', 'bas', 'gauche'],
     [0, 0, 0, 0, 0],
-    ['Metric?', false],
+    ['Metrique?', false],
     ['Panneaux', 'Quantité', 'Largeur', 'Hauteur'],
     [1, 0, 0, 0],
   ],
