@@ -352,7 +352,7 @@ option {
         step="0.05"
         measurement="{'"'}" />
     </div>
-    cnc settings
+    <!-- cnc settings -->
     <Headers
       on:toggle="{() => ($settings.subsettings.offset = !$settings.subsettings.offset)}"
       open="{$settings.subsettings.offset}"
@@ -360,11 +360,11 @@ option {
       english="CNC Offset"
       french="Offset CNC" />
     <div class="subsetting" class:active="{$settings.subsettings.offset}">
-      {#each Object.keys($settings.offset) as offset}
+      {#each Object.keys($data.offset) as offset}
         <NumInputs
           english="{offset}"
           french="{offset}"
-          bind:value="{$settings.offset[offset]}"
+          bind:value="{$data.offset[offset]}"
           max="{$settings.units ? 2800 : 121}"
           step="{$settings.units ? 0.5 : 0.03125}"
           bind:unit="{$settings.units}"

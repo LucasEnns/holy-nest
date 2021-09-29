@@ -22,11 +22,6 @@ const defaultSettings = {
   nestOrder: 'widest',
   nestDirectionBottom: true,
   units: false,
-  offset: {
-    X: 0,
-    Y: 0,
-    Z: 0,
-  },
   tools: { profile: '9', engraver: '3', tool: '9' },
   cnc: cncLibrary,
   subsettings: {
@@ -65,6 +60,11 @@ const defaultData = {
   name: '',
   sheets: [],
   errors: [],
+  offset: {
+    X: 0,
+    Y: 0,
+    Z: 0,
+  },
   tools: {
     engraver: {
       tool: 3,

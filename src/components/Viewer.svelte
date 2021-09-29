@@ -157,8 +157,8 @@ svg {
           on:mouseleave="{hideInfo}"
           class="sheet print"
           id="{index}"
-          x="{(shift(index).x + $settings.material.margins / 2) * scale}"
-          y="{(shift(index).y + $settings.material.margins / 2) * scale}"
+          x="{(shift(index).x + $settings.material.margins / 2 - $data.offset.X) * scale}"
+          y="{(shift(index).y + $settings.material.margins / 2 + $data.offset.Y) * scale}"
           width="{(sheet.sheet_width - $settings.material.margins) * scale}"
           height="{(sheet.sheet_height - $settings.material.margins) * scale}"></rect>
       </g>
