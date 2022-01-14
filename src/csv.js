@@ -1,5 +1,7 @@
 import { hasNumber, toFloat } from './methods.js'
 
+// time to rewrite from ruby version
+
 export function CSVToArray(strData, headerRows = 1, strDelimiter = ',') {
   // Create a regular expression to parse the CSV values.
   var regexPattern = new RegExp(

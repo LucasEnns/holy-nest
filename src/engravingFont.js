@@ -303,7 +303,7 @@ export const CHARACTERS = {
     [2, 2],
   ],
   '[': [
-    // xStart side icon
+    // left side icon
     [0, 1],
     [0, 3],
     [1, 3, '+'], // lift bit before next move
@@ -325,7 +325,7 @@ export const CHARACTERS = {
     [2, 3],
   ],
   "'": [
-    // rop icon
+    // top icon
     [0, 1],
     [0, 2],
     [2, 2],
@@ -337,7 +337,7 @@ export const CHARACTERS = {
   ],
 
   ',': [
-    //yStart icon
+    //bot icon
     [0, 1],
     [2, 1],
     [2, 2, '+'],
