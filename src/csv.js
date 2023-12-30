@@ -1,69 +1,43 @@
-import { hasNumber, toFloat } from './methods.js'
+import { csvTemplate, defaultSettings } from './stores.js'
+import { hasNumber, toFloat } from './helperFunctions.js'
 
-// time to rewrite from ruby version
+export function CSVToArray(csv, headerRows = 0) {
+  const ROW_END = new RegExp('\r|\n', 'i'),
+    COLUMN_END = new RegExp(',|;|:', 'i')
+  // COLUMN_END = ','
 
-export function CSVToArray(strData, headerRows = 1, strDelimiter = ',') {
-  // Create a regular expression to parse the CSV values.
-  var regexPattern = new RegExp(
-    '(\\' +
-      strDelimiter +
-      '|\\r?\\n|\\r|^)' + // Delimiters.
-      '(?:"([^"]*(?:""[^"]*)*)"|' + // Quoted fields.
-      '([^"\\' +
-      strDelimiter +
-      '\\r\\n]*))', // Standard fields.
-    'gi'
-  )
+  let array = csv
+    .split(ROW_END)
+    .map((column) =>
+      column
+        .split(COLUMN_END)
+        .map((cell) => (hasNumber(cell) ? toFloat(cell) : cell))
+    )
 
-  // Create an array of arrays to hold csv data.
-  var arrData = [[]]
+  checkHeaderValidity()
 
-  // Create an array to hold our individual pattern
-  // matching groups.
-  var arrMatches = null
-
-  // Keep looping over the regular expression matches
-  // until we can no longer find a match.
-  while ((arrMatches = regexPattern.exec(strData))) {
-    // Get the delimiter that was found.
-    var strMatchedDelimiter = arrMatches[1]
-
-    // Check to see if the given delimiter has a length
-    // (is not the start of string) and if it matches
-    // field delimiter. If id does not, then we know
-    // that this delimiter is a row delimiter.
-    if (strMatchedDelimiter.length && strMatchedDelimiter != strDelimiter) {
-      // Since we have reached a new row of data,
-      // add an empty row to our data array.
-      arrData.push([])
-    }
-
-    // Now that we have our delimiter out of the way,
-    // let's check to see which kind of value we
-    // captured (quoted or unquoted).
-    if (arrMatches[2]) {
-      // We found a quoted value. When we capture
-      // this value, unescape any double quotes.
-      var strMatchedValue = arrMatches[2].replace(new RegExp('""', 'g'), '"')
-    } else {
-      // We found a non-quoted value.
-      var strMatchedValue = arrMatches[3]
-    }
-
-    if (hasNumber(strMatchedValue)) {
-      strMatchedValue = toFloat(strMatchedValue)
-    }
-
-    // Now that we have our value string, let's add
-    // it to the data array.
-    arrData[arrData.length - 1].push(strMatchedValue)
-  }
-
-  // Return the parsed data.
-  return arrData.filter((item, index) => {
-    // keep all header rows
-    if (index < headerRows) return true
-    // removes blanc rows thereafter
-    return item.filter((inner) => inner !== '').length
+  return array.filter((v, i) => {
+    if (i < headerRows) return true
+    return v.filter((cell) => cell !== '').length
   })
+
+  function checkHeaderValidity() {
+    if (
+      array[0][0] == csvTemplate.en[0][0] ||
+      array[0][0] == csvTemplate.fr[0][0]
+    ) {
+      return
+    }
+
+    const headers = csvTemplate[defaultSettings.language].slice(0, -1)
+
+    if (typeof array[0][2] == 'number') {
+      array = [...headers, ...array]
+      // console.log(csv)
+    }
+
+    if (typeof array[0][2] == 'string' && typeof array[1][2] == 'number') {
+      array = [...headers, ...array.slice(1)]
+    }
+  }
 }

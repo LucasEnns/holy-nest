@@ -1,6 +1,6 @@
 <script>
 import { settings, data } from '../stores.js'
-import { formatDate } from '../methods.js'
+import { formatDate } from '../helperFunctions.js'
 import { CSVToArray } from '../csv.js'
 import Tooltips from './Tooltips.svelte'
 import { createEventDispatcher } from 'svelte'
@@ -57,6 +57,7 @@ function loadFile() {
   }
   badFile = true
 }
+
 </script>
 
 <style>
@@ -150,12 +151,7 @@ input:focus + .file-icon {
 .dl-cnc:hover {
   background-image: url('../img/dl-cnc-hover.png');
 }
-.setting-icon {
-  background-image: url('../img/settings.png');
-}
-.setting-icon:hover {
-  background-image: url('../img/settings-hover.png');
-}
+
 </style>
 
 <svelte:head>

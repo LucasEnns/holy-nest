@@ -1,10 +1,7 @@
 <script>
 import { settings, data } from '../stores.js'
-import { toMM, toInches } from '../methods.js'
-import TextInputs from './TextInputs.svelte'
-import CheckInputs from './CheckInputs.svelte'
+import { toMM, toInches, trunc } from '../helperFunctions.js'
 import Tooltips from './Tooltips.svelte'
-import Headers from './Headers.svelte'
 import { createEventDispatcher } from 'svelte'
 
 const dispatch = createEventDispatcher()
@@ -26,7 +23,6 @@ function addRow() {
 }
 
 function sortAscending(index) {
-  //add support for alpha numberic
   $data.csv.panels = $data.csv.panels.sort((a, b) => a[index] - b[index])
 }
 function sortDescending(index) {
@@ -39,15 +35,37 @@ function convertUnits() {
     index[2] = convert(index[2])
     index[3] = convert(index[3])
   })
-  // toggle boolean
   $data.csv.contents[3][1] = $settings.units = !metric
 }
+
 </script>
 
 <style>
 .wrapper {
   height: max-content;
   padding: 0;
+}
+
+.info {
+  color: var(--blue);
+  margin: 0.3rem 0;
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+  padding-bottom: 1rem;
+}
+.info:hover {
+  background-color: var(--second-bg);
+  cursor: pointer;
+}
+.check {
+  position: absolute;
+  right: 1rem;
+  margin-top: 1rem;
+  font-size: var(--xxlarge);
+  visibility: hidden;
+}
+.info:hover .check {
+  visibility: visible;
 }
 
 ul {
@@ -91,21 +109,19 @@ input:hover::selection {
 div {
   padding-top: 1rem;
 }
-.error,
-.error + p {
+.error {
   color: var(--third);
 }
+
+.error:hover {
+  background-color: var(--primary-bg);
+  cursor: auto;
+}
+
 </style>
 
 <div class="wrapper">
   <div>
-    {#if $data.errors.length}
-      <h5 class="error">ERROR{$data.errors.length > 1 ? 'S' : ''}:</h5>
-      {#each $data.errors as error}
-        <p>{error}</p>
-      {/each}
-    {/if}
-
     <ul class="header">
       <li on:click="{() => sortAscending(0)}">
         <h1>
@@ -166,6 +182,7 @@ div {
         </li>
         <li>
           <input
+            class:error="{line[2] > findMax('width')}"
             type="number"
             min="0"
             max="{findMax('width')}"
@@ -179,6 +196,7 @@ div {
         </li>
         <li>
           <input
+            class:error="{line[3] > findMax('height')}"
             type="number"
             min="0"
             max="{findMax('height')}"
@@ -194,4 +212,21 @@ div {
     {/each}
     <ul class="new-row" on:click="{addRow}" role="button">+</ul>
   </div>
+
+  {#if $data.errors.length}
+    <div class="info error">
+      <h5 class="error">ERREUR{$data.errors.length > 1 ? 'S' : ''}:</h5>
+      {#each $data.errors as error}
+        <p class="error">{error}</p>
+      {/each}
+    </div>
+  {/if}
+
+  {#if $data.averageWaste}
+    <div class="info" on:click="{() => ($data.averageWaste = false)}">
+      <h5 class="check">✕</h5>
+      <h5>Moyen perte/feuille: {trunc($data.averageWaste.all, 1)} %</h5>
+      <h5>Moyen perte/feuille plein: {trunc($data.averageWaste.full, 1)} %</h5>
+    </div>
+  {/if}
 </div>

@@ -9,8 +9,8 @@ function setLanguage() {
   return 'en'
 }
 
-const defaultSettings = {
-  BETA3: '< update key to update settings',
+export const defaultSettings = {
+  version_1_0_1: '< update key to update settings',
   language: setLanguage(),
   material: {
     width: 49,
@@ -19,7 +19,7 @@ const defaultSettings = {
     margins: 0.3,
   },
   nestTypeColumn: false,
-  nestOrder: 'widest',
+  nestOrder: 'automatic',
   nestDirectionBottom: true,
   units: false,
   tools: { profile: '9', engraver: '3', tool: '9' },

@@ -1,0 +1,25 @@
+C-I7 - F1 - facade,1,20.5,15.25
+C-I7 - F2 - facade,1,20.5,7.5
+C-I8 - F1 - porte gauche,1,17.9375,22.875
+C-I8 - F1 - porte droit,1,17.9375,22.875
+C-I9 - F1 - facade,1,17.75,22.875
+C-I10 - F1 - facade,1,26.5,11.375
+C-I10 - F2 - facade,1,26.5,11.375
+C-I12 - F1 - porte droit,1,25.6,29.875
+C-GM1B - F1 - porte gauche,1,16.525,30.375
+C-GM2B - F1 - facade,1,17.0312,30.375
+
+
+
+C-I11-G - F1 - porte gauche,1,25.4375,29.875
+C-I11-G - F1 - porte droit,1,25.4375,29.875
+C-I11-D - F1 - porte gauche,1,25.4375,29.875
+C-I11-D - F1 - porte droit,1,25.4375,29.875
+C-I7 - F3 - facade,1,20.5,7.5
+C-I8 - F2 - faux facade,1,36.0,7.5
+C-I9 - F2 - facade,1,17.75,7.5
+C-I10 - F3 - facade,1,26.5,7.5
+C-GM1C - F1 - porte gauche,1,16.525,42.8125
+C-GM2C - F1 - porte droit,1,17.0312,42.8125
+C-GM1H - F1 - porte gauche,1,16.525,11.5
+C-GM2H - F1 - porte droit,1,17.0312,11.5

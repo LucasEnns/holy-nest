@@ -1,11 +1,10 @@
 export function toFloat(str) {
-  if (!isNaN(str)) return cleanFloat(str) // if number return float
+  if (!isNaN(str)) return cleanFloat(str)
   if (str.includes('/') && !str.includes('.')) {
     return str
-      .split(' ') // covert rational string into array
-      .filter((item) => item !== '') // removes multiple spaces
+      .split(' ')
+      .filter((item) => item !== '')
       .reduce((total, item) => {
-        // get array total of whole # + fraction
         if (item.includes('/')) {
           let frac = item.split('/').filter((item) => item !== '')
           return total + cleanFloat(frac[0] / frac[1])

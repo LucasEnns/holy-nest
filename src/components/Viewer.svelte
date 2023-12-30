@@ -1,9 +1,9 @@
 <script>
-// to do : units to mm scale setting
+//TO DO : units to mm scale setting
 
 import { settings, data } from '../stores.js'
 import { afterUpdate } from 'svelte'
-import { trunc } from '../methods.js'
+import { trunc } from '../helperFunctions.js'
 
 let id,
   displayInfo = false,
@@ -36,7 +36,6 @@ function hideInfo() {
 }
 
 function flipY(y, height) {
-  // return y
   return $settings.material.height - height - y
 }
 
@@ -52,13 +51,14 @@ function shift(index) {
     h = rows * $settings.material.height
   return { x, y, w, h }
 }
+
 </script>
 
 <style>
 .viewer {
   height: 100vh;
   padding: 2vh 2vw;
-  z-index: -1;
+  z-index: 1;
 }
 .infocard {
   position: fixed;
@@ -120,6 +120,7 @@ svg {
 .id.active {
   fill: var(--primary-bg);
 }
+
 </style>
 
 {#if displayInfo}
@@ -145,9 +146,9 @@ svg {
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink"
-    width="{shift($data.sheets.length - 1).w * scale || 0}"
-    height="{shift($data.sheets.length - 1).h * scale || 0}"
-    viewBox="0 0 {shift($data.sheets.length - 1).w * scale || 0} {shift($data.sheets.length - 1).h * scale || 0}"
+    width="{shift($data.sheets.last).w * scale || 0}"
+    height="{shift($data.sheets.last).h * scale || 0}"
+    viewBox="0 0 {shift($data.sheets.last).w * scale || 0} {shift($data.sheets.last).h * scale || 0}"
     preserveAspectRatio="xMidYMid meet">
     {#each $data.sheets as sheet, index}
       <g id="sheets">
@@ -184,6 +185,6 @@ svg {
           </text>
         {/each}
       </g>
-    {/each}>
+    {/each}
   </svg>
 </div>

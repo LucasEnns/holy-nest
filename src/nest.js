@@ -1,11 +1,6 @@
-/////////////////TO DO//////////////////////////////////
-// refactor ugly code
-
-let NEST_ORDER = 'widest'
-
 export function Nest(panelCSV, settings) {
-  NEST_ORDER = settings.nestOrder
   let ERRORS = [],
+    NEST_ORDER = settings.nestOrder || 'automatic',
     IS_FROM_BOTTOM = settings.nestDirectionBottom,
     IS_BY_COLUMNS = settings.nestTypeColumn,
     CUTTER = settings.cnc[settings.tools.profile].diameter || 0.375,
@@ -13,60 +8,119 @@ export function Nest(panelCSV, settings) {
       width: settings.material.width || 49,
       height: settings.material.height || 97,
       margins: settings.material.margins || 0.25,
-      max_width: () => MATERIAL.width - MATERIAL.margins * 2 - CUTTER,
-      max_height: () => MATERIAL.height - MATERIAL.margins * 2 - CUTTER,
-    },
-    PANELS = panelObjectMap(panelCSV), // raw csv panel input converted
-    SHEETS = makeSheets(PANELS)
+      max_width: () => MATERIAL.width - MATERIAL.margins * 2,
+      max_height: () => MATERIAL.height - MATERIAL.margins * 2,
+    }
+  let PANELS = preprocessPanels(panelCSV)
 
-  return { sheets: SHEETS, errors: ERRORS }
+  if (NEST_ORDER == 'automatic') {
+    let sheets = optimalNesting()
+    return {
+      sheets,
+      errors: ERRORS,
+      averageWaste: calculateAverageWaste(sheets),
+    }
+  } else {
+    let sheets = makeSheets(panelsWithNestingOrder(NEST_ORDER))
+    return {
+      sheets,
+      errors: ERRORS,
+      averageWaste: calculateAverageWaste(sheets),
+    }
+  }
 
-  ////// helper functions below ///////////////
+  function optimalNesting() {
+    let bestFit = undefined,
+      nestingOrders = ['widest', 'tallest', 'biggest']
 
-  function panelObjectMap(csv) {
-    return new List(
-      csv.flatMap((i) => panelTranslator(i).map((i) => new Panel(i)))
-    ).flat()
+    for (let isByColumns of [false, true]) {
+      IS_BY_COLUMNS = isByColumns
 
-    function panelTranslator([id, quantity, width, height]) {
-      return removeErrors()
+      for (let order of nestingOrders) {
+        let panels = panelsWithNestingOrder(order),
+          sheets = makeSheets(panels)
+        if (sheets.empty()) return sheets
+        let sheetSpaceUsed = sheets.last().area,
+          thisFit = {
+            isByColumns,
+            order,
+            sheets: sheets.length,
+            sheetSpaceUsed,
+          }
 
-      function removeErrors() {
+        if (!bestFit) bestFit = thisFit
+        if (bestFit.sheets > sheets.length) bestFit = thisFit
+        if (bestFit.sheets < sheets.length) continue
+        if (bestFit.sheetSpaceUsed > sheetSpaceUsed) bestFit = thisFit
+      }
+    }
+    IS_BY_COLUMNS = bestFit.isByColumns
+    let panels = panelsWithNestingOrder(bestFit.order)
+    return makeSheets(panels)
+  }
+
+  function calculateAverageWaste(sheets) {
+    if (sheets.empty()) return false
+    return {
+      all:
+        (sheets.reduce((total, v) => total + v.waste_ratio, 0) /
+          sheets.length) *
+        100,
+      full:
+        (sheets.slice(0, -1).reduce((total, v) => total + v.waste_ratio, 0) /
+          (sheets.length - 1)) *
+        100,
+    }
+  }
+
+  //////////// PANEL FUNCTIONS //////////////////////////
+
+  function panelsWithNestingOrder(nestingOrder) {
+    return PANELS.map((v) => new Panel([...v, nestingOrder]))
+  }
+
+  function preprocessPanels(csv) {
+    return new List(csv.flatMap((v) => preprocessor(v))).flat()
+
+    function preprocessor([id, quantity, width, height]) {
+      return removeDoesNotFit()
+
+      function removeDoesNotFit() {
         if (width > MATERIAL.max_width() || height > MATERIAL.max_height()) {
           ERRORS.push(`Panneau ${id} est trop gros`)
-          // ERRORS.push(`Panel ${id} is too big`)
           return []
         } else if (!width || !height || !quantity) return []
-        return separatePanels()
+        return makeMultiplesUnique()
       }
-      function separatePanels(n = 0, panelOutput = []) {
+      function makeMultiplesUnique() {
+        let n = 0,
+          panelOutput = []
         width += CUTTER
         height += CUTTER
         while (quantity > n++) {
           let qID = ''
           if (quantity > 1) qID = `${n} sur ${quantity}`
           // if ( quantity > 1 ) q = `${n} of ${quantity}`
-          panelOutput.push([qID, id, width, height, NEST_ORDER])
-          // n++
+          panelOutput.push([qID, id, width, height])
         }
         return panelOutput
       }
     }
   }
 
+  //////////// NESTING FUNCTIONS //////////////////////////
+
   function fillRow(panels) {
     let row = new List(panels.placementBy().place())
     let maxHeight = row[0].height
-    // add columns of panels to row until
-    // no space remains or no more panels
+    // add columns of panels to row until no space remains or no more panels
     while (panels.fitsRow(row, MATERIAL.max_width())) {
       let column = new List(panels.fitsRow(row, MATERIAL.max_width()).place())
       // add more panels to column if space remains
       while (panels.fitsColumn(column, maxHeight)) {
         column.push(panels.fitsColumn(column, maxHeight).place())
       }
-      // return nested array only if
-      // more than one panel in column
+      // return nested array only if more than one panel in column
       if (column.length === 1) row.push(column[0])
       else row.push(column)
     }
@@ -78,11 +132,11 @@ export function Nest(panelCSV, settings) {
       let row = fillRow(panels)
       rows.push(
         new Row(
-          row.rowWidth(), //width
-          row.rowHeight(), // height
-          row.totalArea(), // area
+          row.rowWidth(),
+          row.rowHeight(),
+          row.totalArea(),
           row,
-          NEST_ORDER // group
+          panels[0].nestOrder
         )
       )
     }
@@ -92,8 +146,7 @@ export function Nest(panelCSV, settings) {
   function fillColumn(panels) {
     let column = new List(panels.placementBy().place())
     let maxWidth = column[0].width
-    // add rows of panels to column until
-    // no space remains or no more panels
+    // add rows of panels to column until no space remains or no more panels
     while (panels.fitsColumn(column, MATERIAL.max_height())) {
       let row = new List(
         panels.fitsColumn(column, MATERIAL.max_height()).place()
@@ -102,13 +155,11 @@ export function Nest(panelCSV, settings) {
       while (panels.fitsRow(row, maxWidth)) {
         row.push(panels.fitsRow(row, maxWidth).place())
       }
-      // return nested array only if
-      // more than one panel in row
+      // return nested array only if more than one panel in row
       if (row.length === 1) column.push(row[0])
       else column.push(row)
     }
     // smallest pieces to center of column
-    // return column.shuffle()
     return column.ascendingWidth()
   }
 
@@ -118,11 +169,11 @@ export function Nest(panelCSV, settings) {
       let column = fillColumn(panels)
       columns.push(
         new Column(
-          column.columnWidth(), //width
-          column.columnHeight(), // height
-          column.totalArea(), // area
+          column.columnWidth(),
+          column.columnHeight(),
+          column.totalArea(),
           column,
-          NEST_ORDER // group
+          panels[0].nestOrder
         )
       )
     }
@@ -154,12 +205,12 @@ export function Nest(panelCSV, settings) {
         addCoordinatesColumn(sheet)
         sheets.push(
           new Sheet(
-            sheet.rowWidth(), // width
-            sheet.rowHeight(), // height
-            sheet.totalArea(), // area
-            sheet.map((list) => list.group).flatten(2), // group
-            sheet, // columns
-            sheets.length + 1, // id
+            sheet.rowWidth(),
+            sheet.rowHeight(),
+            sheet.totalArea(),
+            sheet.map((list) => list.group).flatten(2),
+            sheet,
+            sheets.length + 1,
             MATERIAL
           )
         )
@@ -190,21 +241,17 @@ export function Nest(panelCSV, settings) {
 
     let yPos = new List()
     rows.forEach((row, i) => {
-      // xPos map of columns, first index === start
       if (i === 0) {
         yPos.push(
           IS_FROM_BOTTOM ? margin : MATERIAL.height - margin - row.height
         )
-      }
-      // everything after calculated += prev. width
-      else {
+      } else {
         yPos.push(
           IS_FROM_BOTTOM
             ? yPos.last() + rows[i - 1].height
             : yPos.last() - row.height
         )
       }
-      // iterate each row in column
       let xPos = new List()
       row.group.forEach((column, j, columns) => {
         // yPos map of rows, first index === start
@@ -212,32 +259,23 @@ export function Nest(panelCSV, settings) {
           firstIndex(j) ? margin : xPos.last() + columns[j - 1].columnWidth()
         )
         // add x and y prop to each row in column
-        // not good clean code -- needs refactoring
+        // not good clean code -- needs refactoring -- maybe use switch case
         let isFirstRow = firstIndex(i) && rows.length > 1
         if (column instanceof Panel) {
-          // set x pos
-          column.y = isFirstRow // true? align right otherwise align left
+          column.y = isFirstRow // true? align top otherwise align bottom
             ? yPos[i] + rows[i].height - column.height
             : yPos[i]
-          // set y pos
           column.x = xPos[j]
         } else {
           column.forEach((rowCol, k) => {
-            // set x pos
             rowCol.y = firstIndex(k)
-              ? isFirstRow // true? align right otherwise align left
+              ? isFirstRow // true? align top otherwise align bottom
                 ? yPos[i] + rows[i].height - rowCol.height
                 : yPos[i]
-              : isFirstRow // true? align right otherwise align left
+              : isFirstRow // true? align top otherwise align bottom
               ? column[k - 1].y - rowCol.height
               : column[k - 1].y + column[k - 1].height
-            // set y pos
-            rowCol.x =
-              // firstIndex(k)
-              // ? xPos[j] + row.rowWidth() - rowCol.width
-              // :
-              xPos[j]
-            // IS_FROM_BOTTOM ?
+            rowCol.x = xPos[j]
           })
         }
       })
@@ -257,10 +295,8 @@ export function Nest(panelCSV, settings) {
       else {
         xPos.push(xPos.last() + columns[i - 1].width)
       }
-      // iterate each row in column
       let yPos = new List()
       column.group.forEach((row, j, rows) => {
-        // yPos map of rows, first index === start
         yPos.push(
           firstIndex(j)
             ? IS_FROM_BOTTOM
@@ -274,15 +310,12 @@ export function Nest(panelCSV, settings) {
         // not good clean code -- needs refactoring
         let isFirstColumn = firstIndex(i) && columns.length > 1
         if (row instanceof Panel) {
-          // set x pos
           row.x = isFirstColumn // true? align right otherwise align left
             ? xPos[i] + columns[i].width - row.width
             : xPos[i]
-          // set y pos
           row.y = yPos[j]
         } else {
           row.forEach((rowCol, k) => {
-            // set x pos
             rowCol.x = firstIndex(k)
               ? isFirstColumn // true? align right otherwise align left
                 ? xPos[i] + columns[i].width - rowCol.width
@@ -290,7 +323,6 @@ export function Nest(panelCSV, settings) {
               : isFirstColumn // true? align right otherwise align left
               ? row[k - 1].x - rowCol.width
               : row[k - 1].x + row[k - 1].width
-            // set y pos
             rowCol.y = IS_FROM_BOTTOM ? yPos[j] : yPos[j - 1] - rowCol.height
           })
         }
@@ -302,6 +334,8 @@ export function Nest(panelCSV, settings) {
     return index === 0
   }
 }
+
+//////////// CLASSES //////////////////////////
 
 class Placement {
   constructor(nestOrder) {
@@ -362,13 +396,14 @@ class Sheet extends Column {
   }
 }
 class List extends Array {
-  //  methods for arrays of Panel or group objects
-  // extending array methods
   first() {
     return this[0]
   }
   last() {
     return this[this.length - 1]
+  }
+  empty() {
+    return this.length == 0
   }
   flatten(dimensions = 1) {
     let flattened = this
@@ -377,7 +412,6 @@ class List extends Array {
     }
     return flattened
   }
-  // sorting methods
   ascendingWidth() {
     return new List(...this).sort((a, b) =>
       b.width != a.width ? b.width - a.width : b.height - a.height
@@ -388,7 +422,6 @@ class List extends Array {
       b.height != a.height ? b.height - a.height : b.width - a.width
     )
   }
-  // methods to find unplaced panels
   notPlaced() {
     return this.filter((panel) => !panel.placed)
   }
@@ -421,7 +454,6 @@ class List extends Array {
       biggest: this.biggest(),
     }[this.length ? this[0].nestOrder : '']
   }
-  // group measurement methods
   totalWidth() {
     return this.reduce((total, panel) => {
       if (panel instanceof List) {

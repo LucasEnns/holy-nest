@@ -6,7 +6,7 @@ import Settings from './components/Settings.svelte'
 import { Nest } from './nest.js'
 import { Gcode } from './gCode.js'
 import { settings, data } from './stores.js'
-import { toInches } from './methods.js'
+import { toInches } from './helperFunctions.js'
 
 function update() {
   $data.name = $data.csv.contents[0][1]
@@ -20,6 +20,7 @@ function calculateNest() {
   let nest = Nest(panelsDimensionsInches(), $settings)
   $data.sheets = nest.sheets
   $data.errors = nest.errors
+  $data.averageWaste = nest.averageWaste
 
   function panelsDimensionsInches() {
     if ($settings.units)
@@ -33,6 +34,7 @@ function calculateNest() {
   }
 }
 update()
+
 </script>
 
 <style>
@@ -65,7 +67,7 @@ update()
 }
 
 .main {
-  z-index: -1;
+  z-index: 4;
 }
 
 .splash {
@@ -93,6 +95,7 @@ h6 {
   position: relative;
   left: 20%;
 }
+
 </style>
 
 <svelte:body on:change="{update}" />

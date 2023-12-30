@@ -1,5 +1,5 @@
 import { CHARACTERS } from './engravingFont.js'
-import { formatDate, cleanFloat } from './methods.js'
+import { formatDate, cleanFloat } from './helperFunctions.js'
 
 export function Gcode(data, settings) {
   let CURRENT_TOOL = 9

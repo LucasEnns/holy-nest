@@ -1,13 +1,13 @@
 <script>
 import { data, settings } from '../stores.js'
-import { toMM, toInches } from '../methods.js'
+import { toMM, toInches } from '../helperFunctions.js'
 import Headers from './Headers.svelte'
 import NumInputs from './NumInputs.svelte'
 import TextInputs from './TextInputs.svelte'
 import CheckInputs from './CheckInputs.svelte'
-import { createEventDispatcher } from 'svelte'
+// import { createEventDispatcher } from 'svelte'
 
-const dispatch = createEventDispatcher()
+// const dispatch = createEventDispatcher()
 const french = $settings.language === 'fr'
 let thickness = $settings.material.thickness
 
@@ -21,16 +21,14 @@ function convertCSVUnits() {
     index[2] = convertUnit(metric, index[2])
     index[3] = convertUnit(metric, index[3])
   })
-  // toggle boolean
   $data.csv.contents[3][1] = $settings.units = !metric
 }
+
 function convertDiameterUnits() {
   let tool = $settings.cnc[$settings.tools.tool]
   tool.diameter = convertUnit(tool.mm, tool.diameter)
 }
-// function convertOffset() {
-//   convertUnit($settings.units, $settings.offset[offset])
-// }
+
 function convertUnit(unit, value) {
   let convert = unit ? toInches : toMM
   return convert(value)
@@ -47,6 +45,7 @@ function activeProfile() {
 function activeLibraryTool(activate) {
   $settings.tools.tool = activate
 }
+
 </script>
 
 <style>
@@ -73,19 +72,18 @@ function activeLibraryTool(activate) {
   text-transform: uppercase;
   font-weight: 100;
   letter-spacing: 1.2rem;
+  display: grid;
+  grid-template-columns: 10fr 1fr;
   border-bottom: 1px solid var(--second-bg);
 }
 .title:hover,
 .title.active:hover {
   border-bottom: 1px solid var(--second);
 }
-/* .title.active {
-  border-bottom: 1px dashed var(--primary);
-} */
-
 .transparent {
+  right: 0;
   font-size: var(--xxlarge);
-  /* color: var(--second); */
+  color: rgba(0, 0, 0, 0);
 }
 .title:hover .transparent {
   color: var(--second);
@@ -122,6 +120,7 @@ option {
   width: 2%;
   flex: 2 !important;
 }
+
 </style>
 
 <div class="settings">
@@ -129,8 +128,8 @@ option {
     class="title"
     class:active="{$settings.subsettings.show}"
     on:click="{() => ($settings.subsettings.show = !$settings.subsettings.show)}">
-    <span class="transparent">{$settings.subsettings.show ? '⩚' : '⩛'}</span>
-    <span> {french ? 'Parametre' : ' Settings'} </span>
+    <span>❁{french ? 'Parametre' : 'Settings'} </span>
+    <span class="transparent"> {$settings.subsettings.show ? '⩚' : '⩛'} </span>
   </div>
   <div class="subsetting" class:active="{$settings.subsettings.show}">
     <!-- project -->
@@ -219,17 +218,14 @@ option {
         bind:checked="{$settings.nestDirectionBottom}"
         on="{french ? 'bas' : 'Bottom'} ⤓"
         off="{french ? 'haut' : 'Top'} ⤒" />
-      <CheckInputs
-        english="Placement direction"
-        french="Direction de placement"
-        bind:checked="{$settings.nestTypeColumn}"
-        on="{french ? 'Colonnes' : 'Columns'} ⇈"
-        off="{french ? 'Lignes' : 'Rows'} ⇉" />
       <h5>
         {french ? 'Classé par le:' : 'Sorted by:'}
         <span class="spread">{''}</span>
         <div class="filler">{''}</div>
         <select class="right" bind:value="{$settings.nestOrder}">
+          <option value="automatic">
+            <span>{french ? 'Automatique' : 'Automatic'}</span>
+          </option>
           <option value="widest">
             <span>{french ? 'Plus large' : 'Widest'} ↔︎</span>
           </option>
@@ -241,6 +237,14 @@ option {
           </option>
         </select>
       </h5>
+      {#if $settings.nestOrder != 'automatic'}
+        <CheckInputs
+          english="Placement direction"
+          french="Direction de placement"
+          bind:checked="{$settings.nestTypeColumn}"
+          on="{french ? 'Colonnes' : 'Columns'} ⇈"
+          off="{french ? 'Lignes' : 'Rows'} ⇉" />
+      {/if}
     </div>
     <!-- cutter -->
     <Headers
