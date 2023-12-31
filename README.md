@@ -1,6 +1,7 @@
 # A GUI to nest panels imported from CSV to sheets to be cut by a CNC
 
-Version 1.0.2 - added automatically optimized nesting
+Version 1.0.2 - added automatically optimized nesting.
+https://lucasenns.github.io/Nest/
 The beta version 2 has been in use at our shop for 2+ years and never a miss-cut panel. This has allowed people with practically no CNC experience to successfully program a simple rectangular cut. It is not a replacement for more intensive cam software, however in my experience, the nesting is as good if not better than some and certainly quicker to generate a CNC file.
 
 Takes a CSV file as input with panel information:
