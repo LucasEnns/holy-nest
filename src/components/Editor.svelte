@@ -228,7 +228,7 @@ div {
       <h5>Moyen perte/feuille: {trunc($data.averageWaste.all, 1)} %</h5>
       <h5>
         Moyen perte/feuille plein:
-        {$data.sheets.length > 1 ? trunc($data.averageWaste.full, 1) : 0}
+        {$data.sheets.length > 1 ? trunc($data.averageWaste.full, 1) : '-'}
         %
       </h5>
     </div>
