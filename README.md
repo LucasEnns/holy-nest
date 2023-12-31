@@ -6,7 +6,7 @@ https://lucasenns.github.io/Nest/
 
 The beta version 2 has been in use at our shop for 2+ years and never a miss-cut panel. This has allowed people with practically no CNC experience to successfully program a simple rectangular cut. It is not a replacement for more intensive cam software, however in my experience, the nesting is as good if not better than some and certainly quicker to generate a CNC file.
 
-Takes a CSV file as input with panel information:`csv names, quantities, width, height`
+Takes a CSV file as input with panel information:`names, quantities, width, height`
 
 The CSV can be edited in the app or even created manually by filling out the table under the settings pane. The edited csv can be downloaded to be worked on on a later date.
 
@@ -31,7 +31,9 @@ NOTE: the g-code has been written for a Castally CNC. It's possible that the cod
 
 ### 5 header rows before first panel row ( can also import with 1 or no header row)
 
-#### Borders not yet functional, ??? = info about project from the settings panel
+- Borders not yet functional
+- ??? = info about project from the settings panel
+- <- info about the line, not part of the CSV
 
 ```csv
 Project,???,Material,???,Project Info,???
