@@ -226,7 +226,11 @@ div {
     <div class="info" on:click="{() => ($data.averageWaste = false)}">
       <h5 class="check">✕</h5>
       <h5>Moyen perte/feuille: {trunc($data.averageWaste.all, 1)} %</h5>
-      <h5>Moyen perte/feuille plein: {trunc($data.averageWaste.full, 1)} %</h5>
+      <h5>
+        Moyen perte/feuille plein:
+        {$data.sheets.length > 1 ? trunc($data.averageWaste.full, 1) : 0}
+        %
+      </h5>
     </div>
   {/if}
 </div>
