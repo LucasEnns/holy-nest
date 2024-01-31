@@ -2,9 +2,10 @@ import { csvTemplate, defaultSettings } from './stores.js'
 import { hasNumber, toFloat } from './helperFunctions.js'
 
 export function CSVToArray(csv, headerRows = 0) {
-  const ROW_END = new RegExp('\r|\n', 'i'),
-    COLUMN_END = new RegExp(',|;|:', 'i')
-  // COLUMN_END = ','
+  csv.replace('\r\n', '\n').replace('\r', '\n')
+
+  const ROW_END = '\n',
+    COLUMN_END = ','
 
   let array = csv
     .split(ROW_END)
@@ -33,7 +34,6 @@ export function CSVToArray(csv, headerRows = 0) {
 
     if (typeof array[0][2] == 'number') {
       array = [...headers, ...array]
-      // console.log(csv)
     }
 
     if (typeof array[0][2] == 'string' && typeof array[1][2] == 'number') {
